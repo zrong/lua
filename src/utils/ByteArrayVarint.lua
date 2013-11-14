@@ -1,6 +1,9 @@
 --[[
-Serialzation bytes stream use varint encoding of google protocol buffer, like ActionScript org.zengrong.utils.ByteArrayVarint
+Serialzation bytes stream use varint encoding of google protocol buffer, I implemented it in ActionScript.
+It depends on BitOp.
+@see https://developers.google.com/protocol-buffers/docs/encoding
 @see https://github.com/zrong/as3/blob/master/src/org/zengrong/utils/ByteArrayVariant.as
+@see http://bitop.luajit.org/index.html
 @author zrong(zengrong.net)
 Creation: 2013-11-14
 ]]

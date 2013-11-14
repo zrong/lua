@@ -1,5 +1,7 @@
 --[[
 Serialzation bytes stream like ActionScript flash.utils.ByteArray
+It depend on lpack
+@see http://underpop.free.fr/l/lua/lpack/
 @author zrong(zengrong.net)
 Creation: 2013-11-14
 ]]
