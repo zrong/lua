@@ -2,6 +2,7 @@
 Serialzation bytes stream like ActionScript flash.utils.ByteArray
 It depend on lpack
 @see http://underpop.free.fr/l/lua/lpack/
+see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html
 @author zrong(zengrong.net)
 Creation: 2013-11-14
 ]]
