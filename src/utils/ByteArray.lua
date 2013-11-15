@@ -53,6 +53,24 @@ function ByteArray:getBytes(__offset, __length)
 	return table.concat(self._buf, "", __offset, __length)
 end
 
+--- Get pack style string by lpack.
+-- The result use ByteArray.getBytes to get is unavailable for lua socket.
+-- E.g. the #self:_buf is 18, but #ByteArray.getBytes is 63.
+-- I think the cause is the table.concat treat every item in ByteArray._buf as a general string, not a char.
+-- So, I use lpack repackage the ByteArray._buf, theretofore, I must convert them to a byte number.
+function ByteArray:getPack(__offset, __length)
+	__offset = __offset or 1
+	__length = __length or #self._buf
+	local __t = {}
+	for i=__offset,__length do
+		__t[#__t+1] = string.byte(self._buf[i])
+	end
+	local __fmt = self:_getELC().."b"..#__t
+	--print("fmt:", __fmt)
+	local __s = string.pack(__fmt, unpack(__t))
+	return __s
+end
+
 function ByteArray:rawPack(__fmt, ...)
 	local __s = string.pack(self:_getELC()..__fmt, ...)
 	self:writeBuf(__s)
