@@ -1,6 +1,6 @@
 --[[
 Serialzation bytes stream like ActionScript flash.utils.ByteArray
-It depend on lpack
+It depends on lpack
 @see http://underpop.free.fr/l/lua/lpack/
 see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html
 @author zrong(zengrong.net)
@@ -13,6 +13,30 @@ ByteArray.ENDIAN_BIG = "ENDIAN_BIG"
 ByteArray.radix = {[10]="u",[8]="o",[16]="X"}
 
 require("pack")
+
+--- Return a string to display.
+-- If self is ByteArray, read string from self.
+-- Else, treat self as byte string.
+-- @param __radix radix of display, value is 8, 10 or 16, default is 10.
+-- @param __separator default is " ".
+-- @return string, number
+function ByteArray.toString(self, __radix, __separator)
+	__radix = __radix or 10
+	__radix = ByteArray.radix[__radix] or "u"
+	__separator = __separator or " "
+	local __fmt = "%"..__radix..__separator
+	local __format = function(__s)
+		return string.format(__fmt, string.byte(__s))
+	end
+	if type(self) == "string" then
+		return string.gsub(self, "(.)", __format)
+	end
+	local __bytes = {}
+	for i=1,#self._buf do
+		__bytes[i] = __format(self._buf[i])
+	end
+	return table.concat(__bytes) ,#__bytes
+end
 
 function ByteArray:ctor(__endian)
 	self._endian = __endian
@@ -65,14 +89,14 @@ function ByteArray:getPack(__offset, __length)
 	for i=__offset,__length do
 		__t[#__t+1] = string.byte(self._buf[i])
 	end
-	local __fmt = self:_getELC().."b"..#__t
+	local __fmt = self:_getELC("b"..#__t)
 	--print("fmt:", __fmt)
 	local __s = string.pack(__fmt, unpack(__t))
 	return __s
 end
 
 function ByteArray:rawPack(__fmt, ...)
-	local __s = string.pack(self:_getELC()..__fmt, ...)
+	local __s = string.pack(self:_getELC(__fmt), ...)
 	self:writeBuf(__s)
 end
 
@@ -101,83 +125,83 @@ function ByteArray:writeBool(__bool)
 end
 
 function ByteArray:readDouble()
-	local __, __v = string.unpack(self:readBuf(8), self:_getELC().."d")
+	local __, __v = string.unpack(self:readBuf(8), self:_getELC("d"))
 	return __v
 end
 
 function ByteArray:writeDouble(__double)
-	local __s = string.pack( self:_getELC().."d", __double)
+	local __s = string.pack( self:_getELC("d"), __double)
 	self:writeBuf(__s)
 end
 
 function ByteArray:readFloat()
-	local __, __v = string.unpack(self:readBuf(4), self:_getELC().."f")
+	local __, __v = string.unpack(self:readBuf(4), self:_getELC("f"))
 	return __v
 end
 
 function ByteArray:writeFloat(__float)
-	local __s = string.pack( self:_getELC().."f",  __float)
+	local __s = string.pack( self:_getELC("f"),  __float)
 	self:writeBuf(__s)
 end
 
 function ByteArray:readInt()
-	local __, __v = string.unpack(self:readBuf(4), self:_getELC().."i")
+	local __, __v = string.unpack(self:readBuf(4), self:_getELC("i"))
 	return __v
 end
 
 function ByteArray:writeInt(__int)
-	local __s = string.pack( self:_getELC().."i",  __int)
+	local __s = string.pack( self:_getELC("i"),  __int)
 	self:writeBuf(__s)
 end
 
 function ByteArray:readUInt()
-	local __, __v = string.unpack(self:readBuf(4), self:_getELC().."I")
+	local __, __v = string.unpack(self:readBuf(4), self:_getELC("I"))
 	return __v
 end
 
 function ByteArray:writeUInt(__uint)
-	local __s = string.pack(self:_getELC().."I", __uint)
+	local __s = string.pack(self:_getELC("I"), __uint)
 	self:writeBuf(__s)
 end
 
 function ByteArray:readShort()
-	local __, __v = string.unpack(self:readBuf(2), self:_getELC().."h")
+	local __, __v = string.unpack(self:readBuf(2), self:_getELC("h"))
 	return __v
 end
 
 function ByteArray:writeShort(__short)
-	local __s = string.pack( self:_getELC().."h",  __short)
+	local __s = string.pack( self:_getELC("h"),  __short)
 	self:writeBuf(__s)
 end
 
 function ByteArray:readUShort()
-	local __, __v = string.unpack(self:readBuf(2), self:_getELC().."H")
+	local __, __v = string.unpack(self:readBuf(2), self:_getELC("H"))
 	return __v
 end
 
 function ByteArray:writeUShort(__ushort)
-	local __s = string.pack(self:_getELC().."H",  __ushort)
+	local __s = string.pack(self:_getELC("H"),  __ushort)
 	self:writeBuf(__s)
 end
 
 function ByteArray:readLong()
-	local __, __v = string.unpack(self:readBuf(8), self:_getELC().."l")
+	local __, __v = string.unpack(self:readBuf(8), self:_getELC("l"))
 	return __v
 end
 
 function ByteArray:writeLong(__long)
-	local __s = string.pack( self:_getELC().."l",  __long)
+	local __s = string.pack( self:_getELC("l"),  __long)
 	self:writeBuf(__s)
 end
 
 function ByteArray:readULong()
-	local __, __v = string.unpack(self:readBuf(4), self:_getELC().."L")
+	local __, __v = string.unpack(self:readBuf(4), self:_getELC("L"))
 	return __v
 end
 
 
 function ByteArray:writeULong(__ulong)
-	local __s = string.pack( self:_getELC().."L", __ulong)
+	local __s = string.pack( self:_getELC("L"), __ulong)
 	self:writeBuf(__s)
 end
 
@@ -192,24 +216,24 @@ function ByteArray:writeUByte(__ubyte)
 end
 
 function ByteArray:readLuaNumber(__number)
-	local __, __v = string.unpack(self:readBuf(8), self:_getELC().."n")
+	local __, __v = string.unpack(self:readBuf(8), self:_getELC("n"))
 	return __v
 end
 
 function ByteArray:writeLuaNumber(__number)
-	local __s = string.pack(self:_getELC().."n", __number)
+	local __s = string.pack(self:_getELC("n"), __number)
 	self:writeBuf(__s)
 end
 
 function ByteArray:readStringBytes(__len)
 	assert(__len, "Need a length of the string!")
 	self:_checkAvailable()
-	local __, __v = string.unpack(self:readBuf(__len), self:_getELC().."A"..__len)
+	local __, __v = string.unpack(self:readBuf(__len), self:_getELC("A"..__len))
 	return __v
 end
 
 function ByteArray:writeStringBytes(__string)
-	local __s = string.pack(self:_getELC().."A", __string)
+	local __s = string.pack(self:_getELC("A"), __string)
 	self:writeBuf(__s)
 end
 
@@ -237,7 +261,7 @@ function ByteArray:readStringUInt()
 end
 
 function ByteArray:writeStringUInt(__string)
-	local __s = string.pack(self:_getELC().."a", __string)
+	local __s = string.pack(self:_getELC("a"), __string)
 	self:writeBuf(__s)
 end
 
@@ -248,7 +272,7 @@ function ByteArray:readStringUShort()
 end
 
 function ByteArray:writeStringUShort(__string)
-	local __s = string.pack(self:_getELC().."P", __string)
+	local __s = string.pack(self:_getELC("P"), __string)
 	self:writeBuf(__s)
 end
 
@@ -341,18 +365,6 @@ function ByteArray:writeBuf(__s)
 	end
 end
 
---- Retuan a string to display
-function ByteArray:toString(__radix, __separator)
-	__radix = __radix or 10
-	__radix = ByteArray.radix[__radix] or "u"
-	__separator = __separator or " "
-	local __fmt = "%"..__radix..__separator
-	local __bytes = {}
-	for i=1,#self._buf do
-		__bytes[i] = string.format(__fmt, string.byte(self._buf[i]))
-	end
-	return table.concat(__bytes)
-end
 ----------------------------------------
 -- private
 ----------------------------------------
@@ -361,13 +373,14 @@ function ByteArray:_checkAvailable()
 end
 
 --- Get Endian Letter Code
-function ByteArray:_getELC()
+function ByteArray:_getELC(__fmt)
+	__fmt = __fmt or ""
 	if self._endian == ByteArray.ENDIAN_LITTLE then
-		return "<"
+		return "<"..__fmt
 	elseif self._endian == ByteArray.ENDIAN_BIG then
-		return ">"
+		return ">"..__fmt
 	end
-	return "="
+	return "="..__fmt
 end
 
 
