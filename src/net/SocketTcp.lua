@@ -1,13 +1,12 @@
 --[[
-	SocketTcp lua客户端
+	SocketTcp lua
 	@author zrong (zengrong.net)
 	Creation: 2013-11-12
-	修改自： http://cn.quick-x.com/?topic=quickkydsocketfzl
-	因为发现luasocket receive(number)方式的一个奇惨问题 所以收数据改成了按行读取
+	from: http://cn.quick-x.com/?topic=quickkydsocketfzl
 ]]
-local SOCKET_TICK_TIME = 0.1 		--SOCKET接收信息轮询时间
-local SOCKET_RECONNECT_TIME = 5		--socket重连偿试时间时隔
-local SOCKET_CONNECT_FAIL_TIMEOUT = 3 --多长时间没有连接成功视为失败
+local SOCKET_TICK_TIME = 0.1 			-- check socket data interval
+local SOCKET_RECONNECT_TIME = 5			-- socket reconnect try interval
+local SOCKET_CONNECT_FAIL_TIMEOUT = 3	-- socket failure timeout
 
 local STATUS_CLOSED = "closed"
 local STATUS_NOT_CONNECTED = "Socket is not connected"
@@ -32,9 +31,9 @@ require("framework.api.EventProtocol").extend(SocketTcp)
 function SocketTcp:ctor(__host, __port, __retryConnectWhenFailure)
     self.host = __host
     self.port = __port
-	self.tickScheduler = nil			-- 消息接收定时器
-	self.reconnectScheduler = nil		-- 重连定时器
-	self.connectTimeTickScheduler = nil	-- 检测连接超时定时器
+	self.tickScheduler = nil			-- timer for data
+	self.reconnectScheduler = nil		-- timer for reconnect
+	self.connectTimeTickScheduler = nil	-- timer for connect timeout
 	self.lastHeartbeatTime = os.time()
 	self.name = 'SocketTcp'
 	self.tcp = nil
@@ -60,8 +59,8 @@ function SocketTcp:connect(__host, __port, __retryConnectWhenFailure)
 	self.tcp:settimeout(0)
 
 	self.tcp:connect(self.host, self.port)
-	-- 检测连接是否成功
-	-- SOCKET_CONNECT_FAIL_TIMEOUT 后如果未连接视为连接失败
+	-- check whether connection is success
+	-- the connection is failure if socket isn't connected after SOCKET_CONNECT_FAIL_TIMEOUT seconds
 	local __connectTimeTick = function ()
 		--echoInfo("%s.connectTimeTick", self.name)
 		if self.isConnected then return end
@@ -72,10 +71,10 @@ function SocketTcp:connect(__host, __port, __retryConnectWhenFailure)
 	    	self:close()
 			self:_connectFailure()
 		end
-		-- 每 SOCKET_TICK_TIME 发送一个值到服务器，发送成功说明服务器连接成功
-		-- 不能采用此种方式，因为服务器会缓存这个1，加到下一次发送的协议的前面，导致下一次发送正常协议就会不返回
+		-- send a "1" to server per SOCKET_TICK_TIME seconds, if send success, then connection is success.
+		-- bug, we can't use this way, because sever will cache this "1", and add it in front of next received data, so next protocol won't return any value.
 		-- local __succ, __status = self.tcp:send(1)
-		-- 改为采用接收包体
+		-- thus, I shall use "*l" to receive data
 		local __body, __status, __partial = self.tcp:receive("*l")
 		--print("receive:", __body, __status, string.len(__partial))
 		if __status == STATUS_TIMEOUT then
@@ -85,7 +84,6 @@ function SocketTcp:connect(__host, __port, __retryConnectWhenFailure)
 	self.connectTimeTickScheduler = scheduler.scheduleGlobal(__connectTimeTick, SOCKET_TICK_TIME)
 end
 
--- 直接调用socket的原始发送功能
 function SocketTcp:send(__data)
 	assert(self.isConnected, self.name .. " is not connected.")
 	self.tcp:send(__data)
@@ -100,10 +98,10 @@ function SocketTcp:close( ... )
 	self:dispatchEvent({name=SocketTcp.EVENT_CLOSE})
 end
 
---用户主动退出
+-- disconnect on user's own initiative.
 function SocketTcp:disconnect()
 	self:_disconnect()
-	self.isRetryConnect = false --主动性断开不重连
+	self.isRetryConnect = false -- initiative to disconnect, no reconnect.
 end
 
 --------------------
@@ -123,7 +121,7 @@ function SocketTcp:_onDisconnect()
 	self:_reconnect();
 end
 
--- 成功建立连接，取消超时计时器
+-- connecte success, cancel the connection timerout timer
 function SocketTcp:_onConnected()
 	--echoInfo("%s._onConnectd", self.name)
 	self.isConnected = true
@@ -132,9 +130,9 @@ function SocketTcp:_onConnected()
 
 	local __tick = function()
 		while true do
-			local __body, __status, __partial = self.tcp:receive("*l")--读取包体
-			--print("body:", __body, "__status:", __status, "__partial:", __partial)
-    	    if __status == STATUS_CLOSED or __status == STATUS_NOT_CONNECTED then --如果读取失败 则跳出
+			local __body, __status, __partial = self.tcp:receive("*l")	-- read the package body
+			print("body:", __body, "__status:", __status, "__partial:", __partial)
+    	    if __status == STATUS_CLOSED or __status == STATUS_NOT_CONNECTED then -- 如果读取失败 则跳出
 		    	self:close()
 		    	if self.isConnected then
 		    		self:_onDisconnect()
@@ -143,8 +141,10 @@ function SocketTcp:_onConnected()
 		    	end
 		   		return
 	    	end
-		    if string.len(__partial) == 0 then return end
-			self:dispatchEvent({name=SocketTcp.EVENT_DATA, partial=__partial, body=__body})
+		    if 	(__body and string.len(__body) == 0) or
+				(__partial and string.len(__partial) == 0)
+			then return end
+			self:dispatchEvent({name=SocketTcp.EVENT_DATA, data=(__partial or __body), partial=__partial, body=__body})
 		end
 	end
 
