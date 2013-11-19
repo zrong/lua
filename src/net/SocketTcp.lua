@@ -131,8 +131,8 @@ function SocketTcp:_onConnected()
 	local __tick = function()
 		while true do
 			local __body, __status, __partial = self.tcp:receive("*l")	-- read the package body
-			print("body:", __body, "__status:", __status, "__partial:", __partial)
-    	    if __status == STATUS_CLOSED or __status == STATUS_NOT_CONNECTED then -- 如果读取失败 则跳出
+			--print("body:", __body, "__status:", __status, "__partial:", __partial)
+    	    if __status == STATUS_CLOSED or __status == STATUS_NOT_CONNECTED then
 		    	self:close()
 		    	if self.isConnected then
 		    		self:_onDisconnect()
@@ -148,22 +148,19 @@ function SocketTcp:_onConnected()
 		end
 	end
 
-	--开始读取TCP数据
+	-- start to read TCP data
 	self.tickScheduler = scheduler.scheduleGlobal(__tick, SOCKET_TICK_TIME)
 end
 
--- 连接失败
 function SocketTcp:_connectFailure(status)
 	--echoInfo("%s._connectFailure", self.name);
 	self:dispatchEvent({name=SocketTcp.EVENT_CONNECT_FAILURE})
 	self:_reconnect();
 end
 
--- 重连 
--- 非主动性断开 SOCKET_RECONNECT_TIME 秒后重连
---主动性断开不重连
+-- if connection is initiative, do not reconnect
 function SocketTcp:_reconnect()
-	if not self.isRetryConnect then return end -- 不允许重连
+	if not self.isRetryConnect then return end
 	--echoInfo("%s._reconnect", self.name)
 	if self.reconnectScheduler then scheduler.unscheduleGlobal(self.reconnectScheduler) end
 	local __doReConnect = function ()

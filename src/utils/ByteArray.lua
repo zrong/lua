@@ -10,7 +10,7 @@ local ByteArray = class("ByteArray")
 
 ByteArray.ENDIAN_LITTLE = "ENDIAN_LITTLE"
 ByteArray.ENDIAN_BIG = "ENDIAN_BIG"
-ByteArray.radix = {[10]="u",[8]="o",[16]="X"}
+ByteArray.radix = {[10]="%03u",[8]="%03o",[16]="%02X"}
 
 require("pack")
 
@@ -22,9 +22,9 @@ require("pack")
 -- @return string, number
 function ByteArray.toString(self, __radix, __separator)
 	__radix = __radix or 10
-	__radix = ByteArray.radix[__radix] or "u"
+	__radix = ByteArray.radix[__radix] or "%u3"
 	__separator = __separator or " "
-	local __fmt = "%"..__radix..__separator
+	local __fmt = __radix..__separator
 	local __format = function(__s)
 		return string.format(__fmt, string.byte(__s))
 	end
