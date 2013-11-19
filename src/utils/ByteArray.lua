@@ -21,8 +21,8 @@ require("pack")
 -- @param __separator default is " ".
 -- @return string, number
 function ByteArray.toString(self, __radix, __separator)
-	__radix = __radix or 10
-	__radix = ByteArray.radix[__radix] or "%u3"
+	__radix = __radix or 16 
+	__radix = ByteArray.radix[__radix] or "%02X"
 	__separator = __separator or " "
 	local __fmt = __radix..__separator
 	local __format = function(__s)

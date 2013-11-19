@@ -130,7 +130,8 @@ function SocketTcp:_onConnected()
 
 	local __tick = function()
 		while true do
-			local __body, __status, __partial = self.tcp:receive("*l")	-- read the package body
+			-- if use "*l" pattern, some buffer will be discarded, why?
+			local __body, __status, __partial = self.tcp:receive("*a")	-- read the package body
 			--print("body:", __body, "__status:", __status, "__partial:", __partial)
     	    if __status == STATUS_CLOSED or __status == STATUS_NOT_CONNECTED then
 		    	self:close()
@@ -144,6 +145,7 @@ function SocketTcp:_onConnected()
 		    if 	(__body and string.len(__body) == 0) or
 				(__partial and string.len(__partial) == 0)
 			then return end
+			if __body and __partial then __body = __body .. __partial end
 			self:dispatchEvent({name=SocketTcp.EVENT_DATA, data=(__partial or __body), partial=__partial, body=__body})
 		end
 	end
