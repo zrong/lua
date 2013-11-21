@@ -6,5 +6,6 @@ function __G__TRACKBACK__(errorMessage)
     print("----------------------------------------")
 end
 
+package.path = package.path .. ";../framework/?.lua"
 require("game")
 game.startup()
