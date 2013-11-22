@@ -49,6 +49,7 @@ function MainScene:testByteArray()
 	print("ba.readByte:", __ba:readByte())
 	print("ba.readByte:", __ba:readByte())
 	print("ba.readString:", __ba:readStringUShort())
+	print("ba.readString:", __ba:readStringUShort())
 	print("ba.available:", __ba:getAvailable())
 	print("ba.toString(16):", __ba:toString(16))
 
@@ -58,10 +59,11 @@ function MainScene:testByteArray()
 end
 
 function MainScene:getDataByLpack()
-	local __pack = string.pack("<b3ihb3P", 0x59, 0x7a, 0, 11, 1101,
+	local __pack = string.pack("<b3ihb3P2", 0x59, 0x7a, 0, 11, 1101,
 		bit.bor(0,0), 
 		bit.bor(bit.lshift(1,3), 0), 
 		bit.bor(bit.lshift(2,3), 0),
+		"",
 		"中文")
 	return __pack
 end
@@ -76,6 +78,7 @@ function MainScene:getByteArray()
 	__ba:writeByte(bit.bor(0,0))
 	__ba:writeByte(bit.bor(bit.lshift(1,3), 0))
 	__ba:writeByte(bit.bor(bit.lshift(2,3), 0))
+	__ba:writeStringUShort("")
 	__ba:writeStringUShort("中文")
 	return __ba
 end

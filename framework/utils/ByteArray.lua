@@ -227,6 +227,7 @@ end
 
 function ByteArray:readStringBytes(__len)
 	assert(__len, "Need a length of the string!")
+	if __len == 0 then return "" end
 	self:_checkAvailable()
 	local __, __v = string.unpack(self:readBuf(__len), self:_getELC("A"..__len))
 	return __v
@@ -241,6 +242,7 @@ end
 -- Alternatively use readStringBytes.
 function ByteArray:readString(__len)
 	assert(__len, "Need a length of the string!")
+	if __len == 0 then return "" end
 	self:_checkAvailable()
 	local __bytes = ""
 	for i=self._pos, #self._buf do
