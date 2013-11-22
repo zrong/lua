@@ -58,6 +58,8 @@ Above codes will print like these:
 
 ## utils.ByteArrayVarint
 
+ByteArrayVarint depends on [BitOP][4].
+
 ByteArrayVarint implements [the Varint encoding in google protocol buffer][7].
 
 See following:
@@ -66,7 +68,7 @@ See following:
 >
 >Each byte in a varint, except the last byte, has the most significant bit (msb) set – this indicates that there are further bytes to come. The lower 7 bits of each byte are used to store the two's complement representation of the number in groups of 7 bits, least significant group first.
 
-Your can use these methods in ByteArrayVarint:
+Your can use these methods(and all ByteArray methods) in ByteArrayVarint:
 
 |Method Name|Description|
 |----|----|
