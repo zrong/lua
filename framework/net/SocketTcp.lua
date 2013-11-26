@@ -163,7 +163,7 @@ end
 -- if connection is initiative, do not reconnect
 function SocketTCP:_reconnect()
 	if not self.isRetryConnect then return end
-	--echoInfo("%s._reconnect", self.name)
+	echoInfo("%s._reconnect", self.name)
 	if self.reconnectScheduler then scheduler.unscheduleGlobal(self.reconnectScheduler) end
 	local __doReConnect = function ()
 		self:connect()

@@ -58,6 +58,7 @@ end
 
 function ByteArray:setPos(__pos)
 	self._pos = __pos
+	return self
 end
 
 function ByteArray:getEndian()
@@ -89,15 +90,16 @@ function ByteArray:getPack(__offset, __length)
 	for i=__offset,__length do
 		__t[#__t+1] = string.byte(self._buf[i])
 	end
-	local __fmt = self:_getELC("b"..#__t)
+	local __fmt = self:_getLC("b"..#__t)
 	--print("fmt:", __fmt)
 	local __s = string.pack(__fmt, unpack(__t))
 	return __s
 end
 
 function ByteArray:rawPack(__fmt, ...)
-	local __s = string.pack(self:_getELC(__fmt), ...)
+	local __s = string.pack(self:_getLC(__fmt), ...)
 	self:writeBuf(__s)
+	return self
 end
 
 --- rawUnPack perform like lpack.unpack, but it is only supported FORMAT parameter.
@@ -108,6 +110,7 @@ function ByteArray:rawUnPack(__fmt)
 	local __next, __val = string.unpack(__s, __fmt)
 	-- update position of the ByteArray
 	self._pos = self._pos + __next
+	return __val, __next
 end
 
 function ByteArray:readBool()
@@ -122,87 +125,96 @@ function ByteArray:writeBool(__bool)
 	else
 		self:writeByte(0)
 	end
+	return self
 end
 
 function ByteArray:readDouble()
-	local __, __v = string.unpack(self:readBuf(8), self:_getELC("d"))
+	local __, __v = string.unpack(self:readBuf(8), self:_getLC("d"))
 	return __v
 end
 
 function ByteArray:writeDouble(__double)
-	local __s = string.pack( self:_getELC("d"), __double)
+	local __s = string.pack( self:_getLC("d"), __double)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readFloat()
-	local __, __v = string.unpack(self:readBuf(4), self:_getELC("f"))
+	local __, __v = string.unpack(self:readBuf(4), self:_getLC("f"))
 	return __v
 end
 
 function ByteArray:writeFloat(__float)
-	local __s = string.pack( self:_getELC("f"),  __float)
+	local __s = string.pack( self:_getLC("f"),  __float)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readInt()
-	local __, __v = string.unpack(self:readBuf(4), self:_getELC("i"))
+	local __, __v = string.unpack(self:readBuf(4), self:_getLC("i"))
 	return __v
 end
 
 function ByteArray:writeInt(__int)
-	local __s = string.pack( self:_getELC("i"),  __int)
+	local __s = string.pack( self:_getLC("i"),  __int)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readUInt()
-	local __, __v = string.unpack(self:readBuf(4), self:_getELC("I"))
+	local __, __v = string.unpack(self:readBuf(4), self:_getLC("I"))
 	return __v
 end
 
 function ByteArray:writeUInt(__uint)
-	local __s = string.pack(self:_getELC("I"), __uint)
+	local __s = string.pack(self:_getLC("I"), __uint)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readShort()
-	local __, __v = string.unpack(self:readBuf(2), self:_getELC("h"))
+	local __, __v = string.unpack(self:readBuf(2), self:_getLC("h"))
 	return __v
 end
 
 function ByteArray:writeShort(__short)
-	local __s = string.pack( self:_getELC("h"),  __short)
+	local __s = string.pack( self:_getLC("h"),  __short)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readUShort()
-	local __, __v = string.unpack(self:readBuf(2), self:_getELC("H"))
+	local __, __v = string.unpack(self:readBuf(2), self:_getLC("H"))
 	return __v
 end
 
 function ByteArray:writeUShort(__ushort)
-	local __s = string.pack(self:_getELC("H"),  __ushort)
+	local __s = string.pack(self:_getLC("H"),  __ushort)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readLong()
-	local __, __v = string.unpack(self:readBuf(8), self:_getELC("l"))
+	local __, __v = string.unpack(self:readBuf(8), self:_getLC("l"))
 	return __v
 end
 
 function ByteArray:writeLong(__long)
-	local __s = string.pack( self:_getELC("l"),  __long)
+	local __s = string.pack( self:_getLC("l"),  __long)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readULong()
-	local __, __v = string.unpack(self:readBuf(4), self:_getELC("L"))
+	local __, __v = string.unpack(self:readBuf(4), self:_getLC("L"))
 	return __v
 end
 
 
 function ByteArray:writeULong(__ulong)
-	local __s = string.pack( self:_getELC("L"), __ulong)
+	local __s = string.pack( self:_getLC("L"), __ulong)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readUByte()
@@ -213,29 +225,32 @@ end
 function ByteArray:writeUByte(__ubyte)
 	local __s = string.pack("b", __ubyte)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readLuaNumber(__number)
-	local __, __v = string.unpack(self:readBuf(8), self:_getELC("n"))
+	local __, __v = string.unpack(self:readBuf(8), self:_getLC("n"))
 	return __v
 end
 
 function ByteArray:writeLuaNumber(__number)
-	local __s = string.pack(self:_getELC("n"), __number)
+	local __s = string.pack(self:_getLC("n"), __number)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readStringBytes(__len)
 	assert(__len, "Need a length of the string!")
 	if __len == 0 then return "" end
 	self:_checkAvailable()
-	local __, __v = string.unpack(self:readBuf(__len), self:_getELC("A"..__len))
+	local __, __v = string.unpack(self:readBuf(__len), self:_getLC("A"..__len))
 	return __v
 end
 
 function ByteArray:writeStringBytes(__string)
-	local __s = string.pack(self:_getELC("A"), __string)
+	local __s = string.pack(self:_getLC("A"), __string)
 	self:writeBuf(__s)
+	return self
 end
 
 --- DO NOT perform this method, it's inefficient.
@@ -254,6 +269,7 @@ end
 
 function ByteArray:writeString(__string)
 	self:writeBuf(__string)
+	return self
 end
 
 function ByteArray:readStringUInt()
@@ -263,8 +279,9 @@ function ByteArray:readStringUInt()
 end
 
 function ByteArray:writeStringUInt(__string)
-	local __s = string.pack(self:_getELC("a"), __string)
+	local __s = string.pack(self:_getLC("a"), __string)
 	self:writeBuf(__s)
+	return self
 end
 
 function ByteArray:readStringUShort()
@@ -274,8 +291,9 @@ function ByteArray:readStringUShort()
 end
 
 function ByteArray:writeStringUShort(__string)
-	local __s = string.pack(self:_getELC("P"), __string)
+	local __s = string.pack(self:_getLC("P"), __string)
 	self:writeBuf(__s)
+	return self
 end
 
 --- Read some bytes from buf
@@ -310,6 +328,7 @@ function ByteArray:writeBytes(__bytes, __offset, __length)
 		self:writeRawByte(__bytes:readRawByte())
 	end
 	__bytes:setPos(__oldPos)
+	return self
 end
 
 --- Actionscript3 readByte == lpack readChar
@@ -321,6 +340,7 @@ end
 
 function ByteArray:writeChar(__char)
 	self:writeRawByte(string.pack("c", __char))
+	return self
 end
 
 --- Use the lua string library to get a byte
@@ -333,6 +353,7 @@ end
 -- The byte is a number between 0 and 255, otherwise, the lua will get an error.
 function ByteArray:writeByte(__byte)
 	self:writeRawByte(string.char(__byte))
+	return self
 end
 
 function ByteArray:readRawByte()
@@ -350,6 +371,7 @@ function ByteArray:writeRawByte(__rawByte)
 	end
 	self._buf[self._pos] = __rawByte
 	self._pos = self._pos + 1
+	return self
 end
 
 --- Read a byte array as string from current position, then update the position.
@@ -365,6 +387,7 @@ function ByteArray:writeBuf(__s)
 	for i=1,#__s do
 		self:writeRawByte(__s:sub(i))
 	end
+	return self
 end
 
 ----------------------------------------
@@ -374,8 +397,8 @@ function ByteArray:_checkAvailable()
 	assert(#self._buf >= self._pos, string.format("End of file was encountered. pos: %d, len: %d.", self._pos, #self._buf))
 end
 
---- Get Endian Letter Code
-function ByteArray:_getELC(__fmt)
+--- Get Letter Code
+function ByteArray:_getLC(__fmt)
 	__fmt = __fmt or ""
 	if self._endian == ByteArray.ENDIAN_LITTLE then
 		return "<"..__fmt

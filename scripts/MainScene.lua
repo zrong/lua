@@ -37,8 +37,8 @@ end
 function MainScene:testByteArray()
 	local __pack = self:getDataByLpack()
 	local __ba = ByteArray.new()
-	__ba:writeBuf(__pack)
-	__ba:setPos(1)
+		:writeBuf(__pack)
+		:setPos(1)
 	print("ba.len:", __ba:getLen())
 	print("ba.readByte:", __ba:readByte())
 	print("ba.readInt:", __ba:readInt())
@@ -59,13 +59,12 @@ function MainScene:getDataByLpack()
 end
 
 function MainScene:getByteArray()
-	local __ba = ByteArray.new()
-	__ba:writeByte(0x59)
-	__ba:writeInt(11)
-	__ba:writeShort(1101)
-	__ba:writeStringUShort("")
-	__ba:writeStringUShort("中文")
-	return __ba
+	return ByteArray.new()
+		:writeByte(0x59)
+		:writeInt(11)
+		:writeShort(1101)
+		:writeStringUShort("")
+		:writeStringUShort("中文")
 end
 
 

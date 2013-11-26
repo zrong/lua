@@ -7,7 +7,7 @@ It depends on BitOp.
 @author zrong(zengrong.net)
 Creation: 2013-11-14
 ]]
-local ByteArrayVarint = class("BitVaiant", require("utils.ByteArray").new())
+local ByteArrayVarint = class("BitVaiant", require("utils.ByteArray"))
 
 require("bit")
 
@@ -25,6 +25,7 @@ end
 function  ByteArrayVarint:writeVInt(__vint)
 	local __v = self:_zigZagEncode(__vint)
 	self:_encodeVarint(__v)
+	return self
 end
 
 function ByteArrayVarint:readUVInt()
@@ -33,6 +34,7 @@ end
 
 function ByteArrayVarint:writeUVInt(__uvint)
 	self:_encodeVarint(__uvint)
+	return self
 end
 
 function ByteArrayVarint:readStringUVInt()
@@ -43,6 +45,7 @@ end
 function ByteArrayVarint:writeStringUVInt(__str)
 	self:writeUVInt(#__str)
 	self:writeStringBytes(__str)
+	return self
 end
 
 --- Convert signed int to unsigned int
@@ -62,7 +65,8 @@ function ByteArrayVarint:_encodeVarint(__value)
 	--[[ 2013-11-19 zrong
 	Our server need a number greater then 32bit, but BitOp only support 32bit signed nubmers. 
 	Client will get a negative number if server send a number greater than 21 4748 3648.
-	But, when we send the number to server use writeUVInt, server will get a positive number.
+	But, when client send the number to server use writeUVInt, server will get a positive number.
+	Yes, it can get the number sent to client.
 	Thus, we discard the estimate for __value.
 	]]
 	-- if __value < 0 then __value = 0 end

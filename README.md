@@ -42,11 +42,13 @@ This is a sample:
 	local __ba2 = ByteArray.new()
 
 	-- you can write some values like actionscript
+	-- also, you can use chaining calls.
 	__ba2:writeByte(0x59)
-	__ba2:writeInt(11)
-	__ba2:writeShort(1101)
+		:writeInt(11)
+		:writeShort(1101)
 	-- write a empty string
 	__ba2:writeStringUShort("")
+	-- write some chinese string
 	__ba2:writeStringUShort("中文")
 
 	-- dump it
@@ -92,9 +94,7 @@ The SocketTCP depends on [LuaSocket][6]
 		socket:addEventListener(SocketTCP.EVENT_CONNECT_FAILURE, onStatus)
 		socket:addEventListener(SocketTCP.EVENT_DATA, onData)
 		
-		local __ba = ByteArray.new()
-		__ba:writeByte(0x59)
-		socket:send(__ba:getPack())
+		socket:send(ByteArray.new():writeByte(0x59):getPack())
 
 		function onStatus(__event)
 			echoInfo("socket status: %s", __event.name)
