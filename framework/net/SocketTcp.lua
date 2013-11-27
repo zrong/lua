@@ -2,6 +2,7 @@
 	SocketTCP lua
 	@author zrong (zengrong.net)
 	Creation: 2013-11-12
+	Last Modification: 2013-11-27
 	from: http://cn.quick-x.com/?topic=quickkydsocketfzl
 ]]
 local SOCKET_TICK_TIME = 0.1 			-- check socket data interval
@@ -28,25 +29,40 @@ SocketTCP._DEBUG = socket._DEBUG
 
 require("framework.api.EventProtocol").extend(SocketTCP)
 
+function SocketTCP.getTime()
+	return socket.gettime()
+end
+
 function SocketTCP:ctor(__host, __port, __retryConnectWhenFailure)
     self.host = __host
     self.port = __port
 	self.tickScheduler = nil			-- timer for data
 	self.reconnectScheduler = nil		-- timer for reconnect
 	self.connectTimeTickScheduler = nil	-- timer for connect timeout
-	self.lastHeartbeatTime = os.time()
 	self.name = 'SocketTCP'
 	self.tcp = nil
 	self.isRetryConnect = __retryConnectWhenFailure
 	self.isConnected = false
 end
 
-function SocketTCP:setName( name )
-	self.name = name
+function SocketTCP:setName( __name )
+	self.name = __name
+	return self
 end
 
-function SocketTCP:getTime()
-	return socket.gettime()
+function SocketTCP:setTickTime(__time)
+	SOCKET_TICK_TIME = __time
+	return self
+end
+
+function SocketTCP:setReconnTime(__time)
+	SOCKET_RECONNECT_TIME = __time
+	return self
+end
+
+function SocketTCP:setConnFailTime(__time)
+	SOCKET_CONNECT_FAIL_TIMEOUT = __time
+	return self
 end
 
 function SocketTCP:connect(__host, __port, __retryConnectWhenFailure)
