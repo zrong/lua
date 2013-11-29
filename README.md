@@ -7,6 +7,30 @@ Other depedence:
 * [lpack][3] (already in quick-cocos2d-x)
 * [BitOp][4] (already in quick-cocos2d-x)
 * [LuaSocket][6] (already in quick-cocos2d-x)
+	
+## utils.Gettext
+
+Usage:
+
+	local mo_data=assert(require("utils.Gettext").loadMOFromFile("main.mo"))
+	print(mo_data["hello"])
+	-- 你好
+	print(mo_data["world"])
+	-- nil
+
+Then you'll get a kind of gettext function:
+
+	local gettext=assert(require("utils.Gettext").gettextFromFile("main.mo"))
+	print(gettext("hello"))
+	-- 你好
+	print(gettext("world"))
+	-- world
+
+With a slight modification this will be ready-to-use for the xgettext tool:
+
+	_ = assert(require("utils.Gettext").gettextFromFile("main.mo"))
+	print(_("hello"))
+	print(_("world"))
 
 ## utils.ByteArray
 
@@ -103,6 +127,7 @@ The SocketTCP depends on [LuaSocket][6]
 		function onData(__event)
 			echoInfo("socket status: %s, data:%s", __event.name, ByteArray.toString(__event.data))
 		end
+
 
 [1]: https://github.com/dualface/quick-cocos2d-x/tree/develop/framework
 [2]: http://zengrong.net

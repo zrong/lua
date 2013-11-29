@@ -1,9 +1,10 @@
 --[[
-	SocketTCP lua
-	@author zrong (zengrong.net)
-	Creation: 2013-11-12
-	Last Modification: 2013-11-27
-	from: http://cn.quick-x.com/?topic=quickkydsocketfzl
+For quick-cocos2d-x
+SocketTCP lua
+@author zrong (zengrong.net)
+Creation: 2013-11-12
+Last Modification: 2013-11-27
+@see http://cn.quick-x.com/?topic=quickkydsocketfzl
 ]]
 local SOCKET_TICK_TIME = 0.1 			-- check socket data interval
 local SOCKET_RECONNECT_TIME = 5			-- socket reconnect try interval
@@ -27,13 +28,12 @@ SocketTCP.EVENT_CONNECT_FAILURE = "SOCKET_TCP_CONNECT_FAILURE"
 SocketTCP._VERSION = socket._VERSION
 SocketTCP._DEBUG = socket._DEBUG
 
-require("framework.api.EventProtocol").extend(SocketTCP)
-
 function SocketTCP.getTime()
 	return socket.gettime()
 end
 
 function SocketTCP:ctor(__host, __port, __retryConnectWhenFailure)
+	require("framework.api.EventProtocol").extend(self)
     self.host = __host
     self.port = __port
 	self.tickScheduler = nil			-- timer for data

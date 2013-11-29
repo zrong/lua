@@ -1,8 +1,9 @@
 --[[
-Serialzation bytes stream like ActionScript flash.utils.ByteArray
+For quick-cocos2d-x
+Serialzation bytes stream like ActionScript flash.utils.ByteArray.
 It depends on lpack
 @see http://underpop.free.fr/l/lua/lpack/
-see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html
+@see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html
 @author zrong(zengrong.net)
 Creation: 2013-11-14
 ]]

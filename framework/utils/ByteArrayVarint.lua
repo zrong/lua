@@ -1,5 +1,6 @@
 --[[
-Serialzation bytes stream use varint encoding of google protocol buffer, I implemented it in ActionScript.
+For quick-cocos2d-x
+Serialzation bytes stream use varint encoding of google protocol buffer, I implemented it in ActionScript. 
 It depends on BitOp.
 @see https://developers.google.com/protocol-buffers/docs/encoding
 @see https://github.com/zrong/as3/blob/master/src/org/zengrong/utils/ByteArrayVariant.as
