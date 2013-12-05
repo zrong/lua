@@ -3,7 +3,7 @@ For quick-cocos2d-x
 SocketTCP lua
 @author zrong (zengrong.net)
 Creation: 2013-11-12
-Last Modification: 2013-11-27
+Last Modification: 2013-12-05
 @see http://cn.quick-x.com/?topic=quickkydsocketfzl
 ]]
 local SOCKET_TICK_TIME = 0.1 			-- check socket data interval
@@ -12,6 +12,8 @@ local SOCKET_CONNECT_FAIL_TIMEOUT = 3	-- socket failure timeout
 
 local STATUS_CLOSED = "closed"
 local STATUS_NOT_CONNECTED = "Socket is not connected"
+local STATUS_ALREADY_CONNECTED = "already connected"
+local STATUS_ALREADY_IN_PROGRESS = "Operation already in progress"
 local STATUS_TIMEOUT = "timeout"
 
 local scheduler = require("framework.scheduler")
@@ -74,30 +76,31 @@ function SocketTCP:connect(__host, __port, __retryConnectWhenFailure)
 	self.tcp = socket.tcp()
 	self.tcp:settimeout(0)
 
-	self.tcp:connect(self.host, self.port)
-	-- check whether connection is success
-	-- the connection is failure if socket isn't connected after SOCKET_CONNECT_FAIL_TIMEOUT seconds
-	local __connectTimeTick = function ()
-		--echoInfo("%s.connectTimeTick", self.name)
-		if self.isConnected then return end
-		self.waitConnect = self.waitConnect or 0
-		self.waitConnect = self.waitConnect + SOCKET_TICK_TIME
-		if self.waitConnect >= SOCKET_CONNECT_FAIL_TIMEOUT then
-			self.waitConnect = nil
-	    	self:close()
-			self:_connectFailure()
-		end
-		-- send a "1" to server per SOCKET_TICK_TIME seconds, if send success, then connection is success.
-		-- but, we can't use this way, because sever will cache this "1", and add it in front of next received data, so next protocol won't return any value.
-		-- local __succ, __status = self.tcp:send(1)
-		-- thus, I shall use "*l" to receive data
-		local __body, __status, __partial = self.tcp:receive("*l")
-		--print("receive:", __body, __status, string.len(__partial))
-		if __status == STATUS_TIMEOUT then
+	local function __checkConnect()
+		local __succ = self:_connect() 
+		if __succ then
 			self:_onConnected()
 		end
+		return __succ
 	end
-	self.connectTimeTickScheduler = scheduler.scheduleGlobal(__connectTimeTick, SOCKET_TICK_TIME)
+
+	if not __checkConnect() then
+		-- check whether connection is success
+		-- the connection is failure if socket isn't connected after SOCKET_CONNECT_FAIL_TIMEOUT seconds
+		local __connectTimeTick = function ()
+			--echoInfo("%s.connectTimeTick", self.name)
+			if self.isConnected then return end
+			self.waitConnect = self.waitConnect or 0
+			self.waitConnect = self.waitConnect + SOCKET_TICK_TIME
+			if self.waitConnect >= SOCKET_CONNECT_FAIL_TIMEOUT then
+				self.waitConnect = nil
+				self:close()
+				self:_connectFailure()
+			end
+			__checkConnect()
+		end
+		self.connectTimeTickScheduler = scheduler.scheduleGlobal(__connectTimeTick, SOCKET_TICK_TIME)
+	end
 end
 
 function SocketTCP:send(__data)
@@ -123,6 +126,14 @@ end
 --------------------
 -- private
 --------------------
+
+--- When connect a connected socket server, it will return "already connected"
+-- @see: http://lua-users.org/lists/lua-l/2009-10/msg00584.html
+function SocketTCP:_connect()
+	local __succ, __status = self.tcp:connect(self.host, self.port)
+	-- print("SocketTCP._connect:", __succ, __status)
+	return __succ == 1 or __status == STATUS_ALREADY_CONNECTED
+end
 
 function SocketTCP:_disconnect()
 	self.isConnected = false

@@ -6,13 +6,13 @@ This library depend on [quick-cocos2d-x framework][1] and following libraries.
 * [BitOp][4] (already in quick-cocos2d-x)
 * [LuaSocket][6] (already in quick-cocos2d-x)
 
-## list
+## Module list
 
-* [Utils.Gettext](#Gettext)
-* [Utils.ByteArray](#ByteArray)
-* [Utils.ByteArrayVarint](#ByteArrayVarint)
-* [Utils.SocketTCP](#SocketTCP)
-
+* [utils.Gettext](#Gettext)
+* [utils.ByteArray](#ByteArray)
+* [utils.ByteArrayVarint](#ByteArrayVarint)
+* [utils.SocketTCP](#SocketTCP)
+	
 <a name="Gettext">
 ## utils.Gettext
 
@@ -45,7 +45,7 @@ It can serialize bytes stream like ActionScript [flash.utils.ByteArray][5]
 
 It depends on [lpack][3].
 
-This is a sample:
+Usage:
 
 	-- use lpack to write a pack
 	local __pack = string.pack("<bihP2", 0x59, 11, 1101, "", "中文")
@@ -119,6 +119,8 @@ On account of a [BitOP][4] limitation, ByteArrayVarint will read a unsigned int 
 ## net.SocketTCP
 
 The SocketTCP depends on [LuaSocket][6]
+
+Usage:
 
 		socket = SocketTCP.new("192.168.18.22", 12001, false)
 		socket:addEventListener(SocketTCP.EVENT_CONNECTED, onStatus)
