@@ -88,7 +88,7 @@ function SocketTCP:connect(__host, __port, __retryConnectWhenFailure)
 			self:_connectFailure()
 		end
 		-- send a "1" to server per SOCKET_TICK_TIME seconds, if send success, then connection is success.
-		-- bug, we can't use this way, because sever will cache this "1", and add it in front of next received data, so next protocol won't return any value.
+		-- but, we can't use this way, because sever will cache this "1", and add it in front of next received data, so next protocol won't return any value.
 		-- local __succ, __status = self.tcp:send(1)
 		-- thus, I shall use "*l" to receive data
 		local __body, __status, __partial = self.tcp:receive("*l")
@@ -177,9 +177,10 @@ function SocketTCP:_connectFailure(status)
 end
 
 -- if connection is initiative, do not reconnect
-function SocketTCP:_reconnect()
+function SocketTCP:_reconnect(__immediately)
 	if not self.isRetryConnect then return end
 	echoInfo("%s._reconnect", self.name)
+	if __immediately then self:connect() return end
 	if self.reconnectScheduler then scheduler.unscheduleGlobal(self.reconnectScheduler) end
 	local __doReConnect = function ()
 		self:connect()

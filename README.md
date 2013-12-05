@@ -1,13 +1,19 @@
 A lua library by [zengrong.net][2]
 
-This library depend on [quick-cocos2d-x framework][1] .
-
-Other depedence:
+This library depend on [quick-cocos2d-x framework][1] and following libraries.
 
 * [lpack][3] (already in quick-cocos2d-x)
 * [BitOp][4] (already in quick-cocos2d-x)
 * [LuaSocket][6] (already in quick-cocos2d-x)
-	
+
+## list
+
+* [Utils.Gettext](#Gettext)
+* [Utils.ByteArray](#ByteArray)
+* [Utils.ByteArrayVarint](#ByteArrayVarint)
+* [Utils.SocketTCP](#SocketTCP)
+
+<a name="Gettext">
 ## utils.Gettext
 
 Usage:
@@ -32,6 +38,7 @@ With a slight modification this will be ready-to-use for the xgettext tool:
 	print(_("hello"))
 	print(_("world"))
 
+<a name="ByteArray">
 ## utils.ByteArray
 
 It can serialize bytes stream like ActionScript [flash.utils.ByteArray][5]
@@ -82,6 +89,7 @@ Above codes will print like these:
 
 ![print result][51]
 
+<a name="ByteArrayVarint">
 ## utils.ByteArrayVarint
 
 ByteArrayVarint depends on [BitOP][4].
@@ -107,7 +115,8 @@ Your can use these methods(and all ByteArray methods) in ByteArrayVarint:
 
 On account of a [BitOP][4] limitation, ByteArrayVarint will read a unsigned int as a **minus**.
 
-## net.SocketTcp
+<a name="SocketTCP">
+## net.SocketTCP
 
 The SocketTCP depends on [LuaSocket][6]
 
