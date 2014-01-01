@@ -5,7 +5,8 @@ It depends on lpack
 @see http://underpop.free.fr/l/lua/lpack/
 @see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html
 @author zrong(zengrong.net)
-Creation: 2013-11-14
+Creation 2013-11-14
+Last Modification 2014-01-01
 ]]
 local ByteArray = class("ByteArray")
 
@@ -97,13 +98,14 @@ function ByteArray:getPack(__offset, __length)
 	return __s
 end
 
+--- rawUnPack perform like lpack.pack, but return the ByteArray.
 function ByteArray:rawPack(__fmt, ...)
-	local __s = string.pack(self:_getLC(__fmt), ...)
+	local __s = string.pack(__fmt, ...)
 	self:writeBuf(__s)
 	return self
 end
 
---- rawUnPack perform like lpack.unpack, but it is only supported FORMAT parameter.
+--- rawUnPack perform like lpack.unpack, but it is only support FORMAT parameter.
 -- Because ByteArray include a position itself, so we haven't to save another.
 function ByteArray:rawUnPack(__fmt)
 	-- read all of bytes.
@@ -111,6 +113,7 @@ function ByteArray:rawUnPack(__fmt)
 	local __next, __val = string.unpack(__s, __fmt)
 	-- update position of the ByteArray
 	self._pos = self._pos + __next
+	-- Alternate value and next
 	return __val, __next
 end
 
@@ -254,7 +257,7 @@ function ByteArray:writeStringBytes(__string)
 	return self
 end
 
---- DO NOT perform this method, it's inefficient.
+--- DO NOT use this method, it's inefficient.
 -- Alternatively use readStringBytes.
 function ByteArray:readString(__len)
 	assert(__len, "Need a length of the string!")
@@ -280,8 +283,23 @@ function ByteArray:readStringUInt()
 end
 
 function ByteArray:writeStringUInt(__string)
-	local __s = string.pack(self:_getLC("a"), __string)
-	self:writeBuf(__s)
+	self:writeUInt(#__string)
+	self:writeStringBytes(__string)
+	return self
+end
+
+--- The length of size_t in C/C++ is mutable.
+-- In 64bit os, it is 8 bytes.
+-- In 32bit os, it is 4 bytes.
+function ByteArray:readStringSizeT()
+	self:_checkAvailable()
+	local __s = self:rawUnPack(self:_getLC("a"))
+	return  __s
+end
+
+--- Perform rawPack() simply.
+function ByteArray:writeStringSizeT(__string)
+	self:rawPack(self:_getLC("a"), __string)
 	return self
 end
 
@@ -408,6 +426,5 @@ function ByteArray:_getLC(__fmt)
 	end
 	return "="..__fmt
 end
-
 
 return ByteArray

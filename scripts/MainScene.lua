@@ -36,21 +36,32 @@ end
 
 function MainScene:testByteArray()
 	local __pack = self:getDataByLpack()
-	local __ba = ByteArray.new()
+	local __ba1 = ByteArray.new()
 		:writeBuf(__pack)
 		:setPos(1)
-	print("ba.len:", __ba:getLen())
-	print("ba.readByte:", __ba:readByte())
-	print("ba.readInt:", __ba:readInt())
-	print("ba.readShort:", __ba:readShort())
-	print("ba.readString:", __ba:readStringUShort())
-	print("ba.readString:", __ba:readStringUShort())
-	print("ba.available:", __ba:getAvailable())
-	print("ba.toString(16):", __ba:toString(16))
+	print("ba1.len:", __ba1:getLen())
+	print("ba1.readByte:", __ba1:readByte())
+	print("ba1.readInt:", __ba1:readInt())
+	print("ba1.readShort:", __ba1:readShort())
+	print("ba1.readString:", __ba1:readStringUShort())
+	print("ba1.readString:", __ba1:readStringUShort())
+	print("ba1.available:", __ba1:getAvailable())
+	print("ba1.toString(16):", __ba1:toString(16))
+	print("ba1.toString(10):", __ba1:toString(10))
 
 	local __ba2 = self:getByteArray()
 	print("ba2.toString(10):", __ba2:toString(10))
 
+
+	local __ba3 = ByteArray.new()
+	local __str = ""
+	for i=1,20 do
+		__str = __str.."ABCDEFGHIJ"
+	end
+	__ba3:writeStringSizeT(__str)
+	__ba3:setPos(1)
+	print("__ba3:readUInt:", __ba3:readUInt())
+	--print("__ba3.readStringSizeT:", __ba3:readStringUInt())
 end
 
 function MainScene:getDataByLpack()

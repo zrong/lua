@@ -64,11 +64,11 @@ end
 function ByteArrayVarint:_encodeVarint(__value)
 	assert(type(__value) == "number", "Value to encode must be a number!")
 	--[[ 2013-11-19 zrong
-	Our server need a number greater then 32bit, but BitOp only support 32bit signed nubmers. 
+	Our server need a number greater than 32bit, but BitOp only support 32bit signed nubmers. 
 	Client will get a negative number if server send a number greater than 21 4748 3648.
 	But, when client send the number to server use writeUVInt, server will get a positive number.
 	Yes, it can get the number sent to client.
-	Thus, we discard the estimate for __value.
+	Thus, we discard the estimating for __value.
 	]]
 	-- if __value < 0 then __value = 0 end
 	local __bytes = bit.band(__value ,0x7f)
