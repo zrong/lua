@@ -1,14 +1,15 @@
 --[[
-For quick-cocos2d-x
 Serialzation bytes stream use varint encoding of google protocol buffer, I implemented it in ActionScript. 
 It depends on BitOp.
+A description: https://github.com/zrong/lua#ByteArrayVarint
+
 @see https://developers.google.com/protocol-buffers/docs/encoding
 @see https://github.com/zrong/as3/blob/master/src/org/zengrong/utils/ByteArrayVariant.as
 @see http://bitop.luajit.org/index.html
 @author zrong(zengrong.net)
 Creation: 2013-11-14
 ]]
-local ByteArrayVarint = class("BitVaiant", require("utils.ByteArray"))
+local ByteArrayVarint = class("BitVaiant", import(".ByteArray"))
 
 require("bit")
 

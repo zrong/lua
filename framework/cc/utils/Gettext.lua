@@ -1,6 +1,7 @@
 --[[
-For quick-cocos2d-x
 Load a mo file, retuan a lua function or table.
+A sample and description(in chinese): http://zengrong.net/post/1986.htm 
+
 @see http://lua-users.org/lists/lua-l/2010-04/msg00005.html
 Modifier zrong(zengrong.net)
 Creation 2013-11-29

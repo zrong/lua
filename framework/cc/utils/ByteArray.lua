@@ -1,10 +1,12 @@
 --[[
-For quick-cocos2d-x
 Serialzation bytes stream like ActionScript flash.utils.ByteArray.
-It depends on lpack
+It depends on lpack.
+A sample: https://github.com/zrong/lua#ByteArray
+
 @see http://underpop.free.fr/l/lua/lpack/
 @see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html
 @author zrong(zengrong.net)
+
 Creation 2013-11-14
 Last Modification 2014-01-01
 ]]
