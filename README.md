@@ -1,24 +1,41 @@
 A lua library by [zengrong.net][2]
 
-This library depend on [quick-cocos2d-x framework][1] and following libraries.
+This library has been merged into [quick-cocos2d-x framework][1].
+
+Following libraries are dependent on:
 
 * [lpack][3] (already in quick-cocos2d-x)
 * [BitOp][4] (already in quick-cocos2d-x)
 * [LuaSocket][6] (already in quick-cocos2d-x)
 
-## Module list
+## Usage
 
-* [utils.Gettext](#Gettext)
-* [utils.ByteArray](#ByteArray)
-* [utils.ByteArrayVarint](#ByteArrayVarint)
-* [utils.SocketTCP](#SocketTCP)
+You can require them in your scripts, the library will **NOT** be imported in framework automatically:
+
+	cc.utils = require("framework.cc.utils.init")
+	cc.net = {}
+	cc.net.SocketTCP = require("framework.cc.net.SocketTCP")
+
+or import them in `cc.init` :
+	
+	-- init net library
+	cc.net = import(".net.init") 
+	-- init utils library
+	cc.utils = import(".utils.init") 
+
+* [cc.utils.Gettext](#Gettext)
+* [cc.utils.ByteArray](#ByteArray)
+* [cc.utils.ByteArrayVarint](#ByteArrayVarint)
+* [cc.net.SocketTCP](#SocketTCP)
 	
 <a name="Gettext">
-## utils.Gettext
+## cc.utils.Gettext
+
+A detailed example about [GNU gettext][9] and [Poedit][8] (in chinese): <http://zengrong.net/post/1986.htm>
 
 Usage:
 
-	local mo_data=assert(require("utils.Gettext").loadMOFromFile("main.mo"))
+	local mo_data=assert(cc.utils.Gettext.loadMOFromFile("main.mo"))
 	print(mo_data["hello"])
 	-- 你好
 	print(mo_data["world"])
@@ -26,7 +43,7 @@ Usage:
 
 Then you'll get a kind of gettext function:
 
-	local gettext=assert(require("utils.Gettext").gettextFromFile("main.mo"))
+	local gettext=assert(cc.utils.Gettext.gettextFromFile("main.mo"))
 	print(gettext("hello"))
 	-- 你好
 	print(gettext("world"))
@@ -34,12 +51,12 @@ Then you'll get a kind of gettext function:
 
 With a slight modification this will be ready-to-use for the xgettext tool:
 
-	_ = assert(require("utils.Gettext").gettextFromFile("main.mo"))
+	_ = assert(cc.utils.Gettext.gettextFromFile("main.mo"))
 	print(_("hello"))
 	print(_("world"))
 
 <a name="ByteArray">
-## utils.ByteArray
+## cc.utils.ByteArray
 
 It can serialize bytes stream like ActionScript [flash.utils.ByteArray][5]
 
@@ -51,7 +68,7 @@ Usage:
 	local __pack = string.pack("<bihP2", 0x59, 11, 1101, "", "中文")
 
 	-- create a ByteArray
-	local __ba = ByteArray.new()
+	local __ba = cc.utils.ByteArray.new()
 
 	-- ByteArray can write a lpack buffer directly
 	__ba:writeBuf(__pack)
@@ -70,7 +87,7 @@ Usage:
 	print("ba.toString(16):", __ba:toString(16))
 
 	-- create a ByteArray
-	local __ba2 = ByteArray.new()
+	local __ba2 = cc.utils.ByteArray.new()
 
 	-- you can write some values like actionscript
 	-- also, you can use chaining calls.
@@ -90,7 +107,7 @@ Above codes will print like these:
 ![print result][51]
 
 <a name="ByteArrayVarint">
-## utils.ByteArrayVarint
+## cc.utils.ByteArrayVarint
 
 ByteArrayVarint depends on [BitOP][4].
 
@@ -116,13 +133,13 @@ Your can use these methods(and all ByteArray methods) in ByteArrayVarint:
 On account of a [BitOP][4] limitation, ByteArrayVarint will read a unsigned int as a **minus**.
 
 <a name="SocketTCP">
-## net.SocketTCP
+## cc.net.SocketTCP
 
 The SocketTCP depends on [LuaSocket][6]
 
 Usage:
 
-		socket = SocketTCP.new("192.168.18.22", 12001, false)
+		socket = cc.net.SocketTCP.new("192.168.18.22", 12001, false)
 		socket:addEventListener(SocketTCP.EVENT_CONNECTED, onStatus)
 		socket:addEventListener(SocketTCP.EVENT_CLOSE, onStatus)
 		socket:addEventListener(SocketTCP.EVENT_CLOSED, onStatus)
@@ -147,4 +164,6 @@ Usage:
 [5]: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html
 [6]: http://w3.impa.br/~diego/software/luasocket/
 [7]: https://developers.google.com/protocol-buffers/docs/encoding
+[8]: http://www.poedit.net/
+[9]: http://www.gnu.org/software/gettext/
 [51]: http://zengrong.net/wp-content/uploads/2013/11/luabytearray.png
