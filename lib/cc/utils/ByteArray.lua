@@ -249,7 +249,7 @@ function ByteArray:writeLuaNumber(__number)
 	return self
 end
 
---- The differently about (read/write)StringBytes and (read/write)String 
+--- The differently about (read/write)StringBytes and (read/write)String
 -- are use pack libraty or not.
 function ByteArray:readStringBytes(__len)
 	assert(__len, "Need a length of the string!")
@@ -358,6 +358,7 @@ function ByteArray:readChar()
 	return __val
 end
 
+--- Use the string.pack of lpack api to write a byte.
 function ByteArray:writeChar(__char)
 	self:writeRawByte(string.pack("c", __char))
 	return self
@@ -369,8 +370,8 @@ function ByteArray:readByte()
 	return string.byte(self:readRawByte())
 end
 
---- Use the lua string library to write a byte.
--- The byte is a number between 0 and 255, otherwise, the lua will get an error.
+--- Use the string.char of lua standard library to write a byte.
+-- The byte is a number between 0 and 255, otherwise, Lua will throw an error.
 function ByteArray:writeByte(__byte)
 	self:writeRawByte(string.char(__byte))
 	return self
@@ -384,6 +385,7 @@ function ByteArray:readRawByte()
 end
 
 function ByteArray:writeRawByte(__rawByte)
+    -- Fill zero between position and length.
 	if self._pos > #self._buf+1 then
 		for i=#self._buf+1,self._pos-1 do
 			self._buf[i] = string.char(0)
