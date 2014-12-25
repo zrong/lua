@@ -7,10 +7,6 @@ zrong framework initialization
 
 print("===========================================================")
 print("              LOAD ZRONG FRAMEWORK")
-print("===========================================================")
-
-
-if type(DEBUG) ~= "number" then DEBUG = 0 end
 
 local CURRENT_MODULE_NAME = ...
 
@@ -20,3 +16,5 @@ zr.PACKAGE_NAME = string.sub(CURRENT_MODULE_NAME, 1, -6)
 require(zr.PACKAGE_NAME .. ".debug")
 require(zr.PACKAGE_NAME .. ".functions")
 require(zr.PACKAGE_NAME .. ".zr.init")
+print("                    DONE")
+print("===========================================================")
