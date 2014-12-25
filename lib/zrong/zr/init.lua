@@ -1,6 +1,9 @@
+local package = zr or {}
 
 -- load utils library
-zr.utils = import(".utils.init")
+package.utils = import(".utils.init")
 
 -- load log library
-zr.log = import(".log.init")
+package.log = import(".log.init")
+
+return package
