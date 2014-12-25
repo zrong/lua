@@ -8,7 +8,7 @@ A sample: https://github.com/zrong/lua#ByteArray
 @author zrong(zengrong.net)
 
 Creation 2013-11-14
-Last Modification 2014-07-09
+Last Modification 2014-12-25
 ]]
 local ByteArray = class("ByteArray")
 
