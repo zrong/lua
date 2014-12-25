@@ -24,46 +24,6 @@ THE SOFTWARE.
 
 --[[--
 
-提供调试接口
-
-]]
-
-if ngx and ngx.log then
-    -- 如果运行在
-    print = function(...)
-        local arg = {...}
-        for k,v in pairs(arg) do
-            arg[k] = tostring(v)
-        end
-        ngx.log(ngx.ERR, table.concat(arg, "\t"))
-    end
-end
-
---[[--
-
-定义一个作废的接口
-
-]]
-function DEPRECATED(newfunction, oldname, newname)
-    return function(...)
-        PRINT_DEPRECATED(string.format("%s() is deprecated, please use %s()", oldname, newname))
-        return newfunction(...)
-    end
-end
-
---[[--
-
-显示作废信息
-
-]]
-function PRINT_DEPRECATED(msg)
-    if not DISABLE_DEPRECATED_WARNING then
-        printf("[DEPRECATED] %s", msg)
-    end
-end
-
---[[--
-
 打印调试信息
 
 ### 用法示例

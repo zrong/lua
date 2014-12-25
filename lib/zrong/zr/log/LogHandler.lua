@@ -30,7 +30,7 @@ function LogHandler:getString(fmt, args)
             strlist[#strlist+1] = tostring(args[i])
         end
     end
-    return table.concat(strlist, ' ')
+    return table.concat(strlist, '\t')
 end
 
 return LogHandler
