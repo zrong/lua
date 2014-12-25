@@ -14,11 +14,11 @@ For some reason in my server development, I moved some packages that my wrote in
 
 # 2. For [quick-cocos2d-x][10]
 
-In [quick-cocos2d-x][10], all of the dependences are included.
+All of the dependences were included in [quick-cocos2d-x][10].
 
 This library has already been merged into [quick-cocos2d-x framework][1].
 
-In [quick-cocos2d-x framework][1], these library still use "cc" package name, but I won't update them.
+In [quick-cocos2d-x framework][1], these librares still use "cc" package name, and I won't update them.
 
 # 3. Usage
 
@@ -33,7 +33,7 @@ or if you have had these necessary global functions, you can require them in you
 ``` lua
 utils = require("lib.zrong.zr.utils.init")
 net = {}
-net.SocketTCP = require("framework.cc.net.SocketTCP")
+net.SocketTCP = require("lib.zrong.zr.net.SocketTCP")
 ```
 
 The necessary global functions are:
@@ -220,9 +220,9 @@ log = zr.log.Logger.new(zr.log.Logger.NOTSET,
 log:debug('You name?', 'zrong')
 log:debug('My name is %s.', 'zrong')
 
---- Following contents will appear in console and log.txt.
-[5.3278] You name?  zrong
-[5.3279] My name is zrong.
+-- Following contents will appear in console and log.txt.
+-- [5.3278] You name?  zrong
+-- [5.3279] My name is zrong.
 ```
 
 [1]: https://github.com/chukong/quick-cocos2d-x/tree/develop/framework
