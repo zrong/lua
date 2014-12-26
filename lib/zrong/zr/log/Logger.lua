@@ -1,4 +1,4 @@
---- lua  日志机制
+--- A lua log implement.
 -- @author zrong(zengrong.net)
 -- Creation: 2014-10-31
 

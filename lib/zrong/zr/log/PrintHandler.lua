@@ -1,11 +1,11 @@
---- 用于 print 信息的 LogHandler
+--- A handler for print infomation.
 -- @author zrong
 -- Creation: 2014-10-31
 
 local PrintHandler  = class('PrintHandler', import(".LogHandler"))
 
-function PrintHandler:ctor(printfun, showtime)
-    PrintHandler.super.ctor(self, showtime)
+function PrintHandler:ctor(printfun, starttime)
+    PrintHandler.super.ctor(self, starttime)
     self._printfun = printfun or print
 end
 

@@ -1445,3 +1445,8 @@ function string.formatnumberthousands(num)
     end
     return formatted
 end
+
+os.gettime = (pcall(require, 'socket') and socket.gettime) 
+    or function()
+        return os.time()
+    end

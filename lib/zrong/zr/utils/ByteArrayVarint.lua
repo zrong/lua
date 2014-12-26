@@ -11,9 +11,7 @@ Creation: 2013-11-14
 ]]
 local ByteArrayVarint = class("ByteArrayVaiant", import(".ByteArray"))
 
-if not pcall(function() require('bit') end) then
-    import('...luabit.bit')
-end
+import('.bit')
 
 function ByteArrayVarint:ctor(__endian)
 	self._endian = __endian

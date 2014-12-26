@@ -1,12 +1,16 @@
-
---- 用于将 log 信息存入文件中的 LogHandler
+--- A base class for log handler.
 -- @author zrong
 -- Creation: 2014-11-14
 
 local LogHandler = class('LogHandler')
 
-function LogHandler:ctor(showtime)
-    self._showtime = showtime
+function LogHandler:ctor(starttime, gettime)
+    self._gettime = nil
+    self._starttime = nil
+    if starttime then
+        self._gettime = gettime or os.time
+        self._starttime = (starttime == 0 and self._gettime()) or starttime
+    end
 end
 
 function LogHandler:emit(fmt, args)
@@ -17,8 +21,8 @@ end
 
 function LogHandler:getString(fmt, args)
     local strlist = {}
-    if self._showtime then
-        strlist[#strlist+1] = string.format('[%.4f]', os.clock())
+    if self._starttime then
+        strlist[#strlist+1] = string.format('[%.4f]', self._gettime()-self._starttime)
     end
     if #args > 0 and 
         type(fmt) == 'string' and

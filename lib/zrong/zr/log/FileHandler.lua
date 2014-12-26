@@ -1,17 +1,15 @@
-
---- 用于将 log 信息存入文件中的 LogHandler
+--- A LogHandler for save log to a file.
 -- @author zrong
 -- Creation: 2014-11-14
 
 local FileHandler = class('LogHandler', import(".LogHandler"))
 
--- file 提供一个用于写入的文件，必须使用绝对路径。
--- file 也可以是一个已经正确打开的文件。
--- mode 文件的打开模式，仅当传入文件名的时候有用。
--- autoflush 是否自动刷新，默认为 false。
--- showtime 是否显示 log 时间，默认为 false。
-function FileHandler:ctor(file, mode, autoflush, showtime)
-    FileHandler.super.ctor(self, showtime)
+-- @file A file to write info or a opened file handler. It must be a absolute path.
+-- @mode A mode for opened file, it is only available when file is a file name.
+-- @autoflush Default value is false。
+-- @starttime A timestamp that start application. Default value is nil (Do not show time).
+function FileHandler:ctor(file, mode, autoflush, starttime)
+    FileHandler.super.ctor(self, starttime)
     mode = mode or 'w+b'
     if type(file) == 'string' then
         self.filename = filename
