@@ -62,7 +62,7 @@ function Logger:error(fmt, ...)
     self:log(Logger.ERROR, fmt, ...)
 end
 
-function Logger:crtical(fmt, ...)
+function Logger:critical(fmt, ...)
     self:log(Logger.CRITICAL, fmt, ...)
 end
 
