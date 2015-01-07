@@ -4,6 +4,8 @@
 
 local LogHandler = class('LogHandler')
 
+-- @starttime 
+-- @gettime A function, return current time.
 function LogHandler:ctor(starttime, gettime)
     self._gettime = nil
     self._starttime = nil
@@ -13,13 +15,13 @@ function LogHandler:ctor(starttime, gettime)
     end
 end
 
-function LogHandler:emit(fmt, args)
+function LogHandler:emit(level, fmt, args)
 end
 
 function LogHandler:flush()
 end
 
-function LogHandler:getString(fmt, args)
+function LogHandler:getString(level, fmt, args)
     local strlist = {}
     if self._starttime then
         strlist[#strlist+1] = string.format('[%.4f]', self._gettime()-self._starttime)

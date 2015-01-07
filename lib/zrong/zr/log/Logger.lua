@@ -42,7 +42,7 @@ function Logger:log(level, fmt, ...)
     if level < self._level then return end
     args = {...}
     for __, logHandler in pairs(self._handlers) do
-        logHandler:emit(fmt, args)
+        logHandler:emit(level, fmt, args)
     end
 end
 

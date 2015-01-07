@@ -8,8 +8,9 @@ local FileHandler = class('LogHandler', import(".LogHandler"))
 -- @mode A mode for opened file, it is only available when file is a file name.
 -- @autoflush Default value is false。
 -- @starttime A timestamp that start application. Default value is nil (Do not show time).
-function FileHandler:ctor(file, mode, autoflush, starttime)
-    FileHandler.super.ctor(self, starttime)
+-- @gettime A function, return current time.
+function FileHandler:ctor(file, mode, autoflush, starttime, gettime)
+    FileHandler.super.ctor(self, starttime, gettime)
     mode = mode or 'w+b'
     if type(file) == 'string' then
         self.filename = filename
@@ -20,8 +21,8 @@ function FileHandler:ctor(file, mode, autoflush, starttime)
     self._autoflush = autoflush
 end
 
-function FileHandler:emit(fmt, args)
-    str = self:getString(fmt, args)
+function FileHandler:emit(level, fmt, args)
+    str = self:getString(level, fmt, args)
     self._file:write(str..'\n')
     if self._autoflush then
         self:flush()
