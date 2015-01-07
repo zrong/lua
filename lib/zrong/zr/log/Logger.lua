@@ -25,7 +25,7 @@ function Logger:getLevel(level)
 end
 
 function Logger:addHandler(logHandler)
-    self.handlers[#self.handlers+1] = logHandler
+    self._handlers[#self._handlers+1] = logHandler
 end
 
 function Logger:clearHandler()

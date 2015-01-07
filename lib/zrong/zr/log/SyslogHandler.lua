@@ -67,7 +67,7 @@ local priority_names = {
     ["panic"]=    LOG_EMERG,      --  DEPRECATED
     ["warn"]=     LOG_WARNING,    --  DEPRECATED
     ["warning"]=  LOG_WARNING,
-    }
+}
 
 local facility_names = {
     ["auth"]=     LOG_AUTH,
@@ -91,7 +91,7 @@ local facility_names = {
     ["local5"]=   LOG_LOCAL5,
     ["local6"]=   LOG_LOCAL6,
     ["local7"]=   LOG_LOCAL7,
-    }
+}
 
 --[[
 #The map below appears to be trivially lowercasing the key. However,
@@ -108,13 +108,24 @@ local priority_map = {
     [Logger.DEBUG] = 'debug',
 }
 
+local logfmt = {
+    '<%d>1', 
+    '%Y-%m-%dT%H:%M:%S.000000+08:00', -- TIMESTAMP 2015-01-06T20:07:10.022787+08:00
+    'HOSTNAME',
+    'APP-NAME',
+    '1000', -- PROCID
+    '-',    -- MSGID
+    '-',    -- SEP
+}
+
 -- @host socket host
 -- @port socket port
 -- @autoflush Default value is false。
-function SyslogHandler:ctor(adapter, facility, autoflush)
+function SyslogHandler:ctor(adapter, facility, appname, autoflush)
     SyslogHandler.super.ctor(self)
     self._ada = adapter
     self.facility = facility
+    self._appname = appname or '-NO-APP-NAME-'
     self._autoflush = autoflush
 end
 
@@ -158,10 +169,11 @@ function SyslogHandler:emit(level, fmt, args)
 end
 
 function SyslogHandler:getString(level, fmt, args)
-    local strlist = {}
-    local prio = string.format('<%d>', 
+    local strlist = clone(logfmt)
+    strlist[1] = string.format(strlist[1], 
         self:encodePriority(self.facility, self:mapPriority(level)))
-    strlist[#strlist+1] = prio
+    strlist[2] = os.date(strlist[2])
+    strlist[4] = self._appname
     if #args > 0 and 
         type(fmt) == 'string' and
         string.find(fmt, "%%") then
