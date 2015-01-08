@@ -112,8 +112,9 @@ local logfmt = {
     '<%d>1', 
     '%Y-%m-%dT%H:%M:%S.000000+08:00', -- TIMESTAMP 2015-01-06T20:07:10.022787+08:00
     'HOSTNAME',
+    'team1201',
     'APP-NAME',
-    '1000', -- PROCID
+    '9999', -- PROCID
     '-',    -- MSGID
     '-',    -- SEP
 }
@@ -125,7 +126,7 @@ function SyslogHandler:ctor(adapter, facility, appname, autoflush)
     SyslogHandler.super.ctor(self)
     self._ada = adapter
     self.facility = facility
-    self._appname = appname or '-NO-APP-NAME-'
+    self._appname = appname or 'NO-APP-NAME'
     self._autoflush = autoflush
 end
 
