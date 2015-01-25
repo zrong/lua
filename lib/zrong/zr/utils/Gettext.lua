@@ -5,26 +5,34 @@ A sample and description(in chinese): http://zengrong.net/post/1986.htm
 @see http://lua-users.org/lists/lua-l/2010-04/msg00005.html
 Modifier zrong(zengrong.net)
 Creation 2013-11-29
+Last Modification 2015-01-25
 
 usage:
 
-    local mo_data=assert(require("utils.Gettext").loadMOFromFile("main.mo"))
+	local Gettext = require("utils.Gettext")
+
+	-- use lua io, cannot use in Android
+    local fd,err=io.open("main.mo","rb")
+    if not fd then return nil,err end
+    local raw_data=fd:read("*all")
+    fd:close()
+
+    local mo_data=assert(Gettext.parseData(raw_data))
     print(mo_data["hello"])
-   -- 你好
+	-- 你好
     print(mo_data["world"])
-   -- nil
+	-- nil
 
-then you'll get a kind of gettext function:
-
-    local gettext=assert(require("utils.Gettext").gettextFromFile("main.mo"))
+	-- then you'll get a kind of gettext function:
+    local gettext= Gettext.gettext(raw_data)
     print(gettext("hello"))
-   -- 你好
+    -- 你好
     print(gettext("world"))
     -- world
 
-with a slight modification this will be ready-to-use for the xgettext tool:
+	-- with a slight modification this will be ready-to-use for the xgettext tool:
 
-    _ = assert(require("utils.Gettext").gettextFromFile("main.mo"))
+    _ = Gettext.gettext(raw_data)
     print(_("hello"))
     print(_("world"))
 ]]
@@ -42,32 +50,10 @@ with a slight modification this will be ready-to-use for the xgettext tool:
 
 local Gettext = {}
 
-function Gettext._getFileData(mo_file)
-	--- use lua io, cannot use in Android
-	--[[
-    local fd,err=io.open(mo_file,"rb")
-    if not fd then return nil,err end
-    local mo_data=fd:read("*all")
-    fd:close()
-	--]]
-
-	--- use quick-cocos2d-x CCFileUtils, cross-platform
-	local mo_data = CCFileUtils:sharedFileUtils():getFileData(mo_file)
-	return mo_data
-end
-
-function Gettext.loadMOFromFile(mo_file)
-	return Gettext.parseData(Gettext._getFileData(mo_file))
-end
-
-function Gettext.gettextFromFile(mo_file)
-	return Gettext.gettext(Gettext._getFileData(mo_file))
-end
-
 function Gettext.gettext(mo_data)
-	local __hash = Gettext.parseData(mo_data)
+	local hash = Gettext.parseData(mo_data)
     return function(text)
-        return __hash[text] or text
+        return hash[text] or text
     end
 end
 
