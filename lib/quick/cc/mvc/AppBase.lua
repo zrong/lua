@@ -11,14 +11,15 @@ function AppBase:ctor(appName, packageRoot)
     self.packageRoot = packageRoot or appName
 
 	--[[
+	-- remove to Main App
     local eventDispatcher = cc.Director:getInstance():getEventDispatcher()
-    local customListenerBg = cc.EventListenerCustom:create(cc.EVENT_COME_TO_BACKGROUND,
+    local customListenerBg = cc.EventListenerCustom:create(AppBase.APP_ENTER_BACKGROUND_EVENT,
                                 handler(self, self.onEnterBackground))
     eventDispatcher:addEventListenerWithFixedPriority(customListenerBg, 1)
-    local customListenerFg = cc.EventListenerCustom:create(cc.EVENT_COME_TO_FOREGROUND,
+    local customListenerFg = cc.EventListenerCustom:create(AppBase.APP_ENTER_FOREGROUND_EVENT,
                                 handler(self, self.onEnterForeground))
     eventDispatcher:addEventListenerWithFixedPriority(customListenerFg, 1)
-	--]]
+	]]
 
     self.snapshots_ = {}
 
@@ -84,6 +85,6 @@ end
 function AppBase:onEnterForeground()
     self:dispatchEvent({name = AppBase.APP_ENTER_FOREGROUND_EVENT})
 end
---]]
+]]
 
 return AppBase
