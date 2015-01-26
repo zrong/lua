@@ -60,27 +60,30 @@ A detailed example about [GNU gettext][9] and [Poedit][8] (in chinese): <http://
 Usage:
 
 ``` lua
-local mo_data=assert(cc.utils.Gettext.loadMOFromFile("main.mo"))
+local Gettext = require("utils.Gettext")
+
+-- Use lua io, cannot use in Android
+local fd,err=io.open("main.mo","rb")
+if not fd then return nil,err end
+local raw_data=fd:read("*all")
+fd:close()
+
+local mo_data=assert(Gettext.parseData(raw_data))
 print(mo_data["hello"])
 -- 你好
 print(mo_data["world"])
 -- nil
-```
 
-Then you'll get a kind of gettext function:
-
-``` lua
-local gettext=assert(cc.utils.Gettext.gettextFromFile("main.mo"))
+-- Then you'll get a kind of gettext function:
+local gettext= Gettext.gettext(raw_data)
 print(gettext("hello"))
 -- 你好
 print(gettext("world"))
 -- world
-```
 
-With a slight modification this will be ready-to-use for the xgettext tool:
+-- With a slight modification this will be ready-to-use for the xgettext tool:
 
-``` lua
-_ = assert(cc.utils.Gettext.gettextFromFile("main.mo"))
+_ = Gettext.gettext(raw_data)
 print(_("hello"))
 print(_("world"))
 ```
