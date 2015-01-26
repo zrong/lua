@@ -1,3 +1,4 @@
+
 --[[
 
 Copyright (c) 2011-2014 chukong-inc.com
@@ -22,46 +23,16 @@ THE SOFTWARE.
 
 ]]
 
---[[--
+local PageView = ccui.PageView
 
-初始化 cc 扩展
-
-cc 扩展在 cocos2dx C++ API 和 quick 基本模块的基础上，提供了符合脚本风格的事件接口、组件架构等扩展。
-
-]]
-
-local CURRENT_MODULE_NAME = ...
-
--- init base classes
-cc.Registry   = import(".Registry")
-cc.GameObject = import(".GameObject")
-cc.EventProxy = import(".EventProxy")
-cc.Component  = import(".components.Component")
-
--- init components
-local components = {
-    "components.behavior.StateMachine",
-    "components.behavior.EventProtocol",
-}
-for _, packageName in ipairs(components) do
-    cc.Registry.add(import("." .. packageName, CURRENT_MODULE_NAME), packageName)
+function PageView:onEvent(callback)
+    self:addEventListener(function(sender, eventType)
+        local event = {}
+        if eventType == 0 then
+            event.name = "TURNING"
+        end
+        event.target = sender
+        callback(event)
+    end)
+    return self
 end
-
-local GameObject = cc.GameObject
-local ccmt = {}
-ccmt.__call = function(self, target)
-    if target then
-        return GameObject.extend(target)
-    end
-    printError("cc() - invalid target")
-end
-setmetatable(cc, ccmt)
-
--- load MVC
-cc.mvc = import(".mvc.init")
-
--- load ui library
-cc.ui = import(".ui.init")
-
--- load net library
-cc.net = import(".net.init")

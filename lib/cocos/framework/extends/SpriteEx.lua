@@ -22,46 +22,46 @@ THE SOFTWARE.
 
 ]]
 
---[[--
+local Sprite = cc.Sprite
 
-初始化 cc 扩展
+function Sprite:playAnimationOnce(animation, args)
+    local actions = {}
 
-cc 扩展在 cocos2dx C++ API 和 quick 基本模块的基础上，提供了符合脚本风格的事件接口、组件架构等扩展。
-
-]]
-
-local CURRENT_MODULE_NAME = ...
-
--- init base classes
-cc.Registry   = import(".Registry")
-cc.GameObject = import(".GameObject")
-cc.EventProxy = import(".EventProxy")
-cc.Component  = import(".components.Component")
-
--- init components
-local components = {
-    "components.behavior.StateMachine",
-    "components.behavior.EventProtocol",
-}
-for _, packageName in ipairs(components) do
-    cc.Registry.add(import("." .. packageName, CURRENT_MODULE_NAME), packageName)
-end
-
-local GameObject = cc.GameObject
-local ccmt = {}
-ccmt.__call = function(self, target)
-    if target then
-        return GameObject.extend(target)
+    local showDelay = args.showDelay or 0
+    if showDelay then
+        self:setVisible(false)
+        actions[#actions + 1] = cc.DelayTime:create(showDelay)
+        actions[#actions + 1] = cc.Show:create()
     end
-    printError("cc() - invalid target")
+
+    local delay = args.delay or 0
+    if delay > 0 then
+        actions[#actions + 1] = cc.DelayTime:create(delay)
+    end
+
+    actions[#actions + 1] = cc.Animate:create(animation)
+
+    if args.removeSelf then
+        actions[#actions + 1] = cc.RemoveSelf:create()
+    end
+
+    if onComplete then
+        actions[#actions + 1] = cc.CallFunc:create(onComplete)
+    end
+
+    local action
+    if #actions > 1 then
+        action = cc.Sequence:create(actions)
+    else
+        action = actions[1]
+    end
+    self:runAction(action)
+    return action
 end
-setmetatable(cc, ccmt)
 
--- load MVC
-cc.mvc = import(".mvc.init")
-
--- load ui library
-cc.ui = import(".ui.init")
-
--- load net library
-cc.net = import(".net.init")
+function Sprite:playAnimationForever(animation)
+    local animate = cc.Animate:create(animation)
+    local action = cc.RepeatForever:create(animate)
+    self:runAction(action)
+    return action
+end

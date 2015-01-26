@@ -24,44 +24,34 @@ THE SOFTWARE.
 
 --[[--
 
-初始化 cc 扩展
-
-cc 扩展在 cocos2dx C++ API 和 quick 基本模块的基础上，提供了符合脚本风格的事件接口、组件架构等扩展。
-
 ]]
 
-local CURRENT_MODULE_NAME = ...
+local c = cc
+local DrawNode = c.DrawNode
 
--- init base classes
-cc.Registry   = import(".Registry")
-cc.GameObject = import(".GameObject")
-cc.EventProxy = import(".EventProxy")
-cc.Component  = import(".components.Component")
-
--- init components
-local components = {
-    "components.behavior.StateMachine",
-    "components.behavior.EventProtocol",
-}
-for _, packageName in ipairs(components) do
-    cc.Registry.add(import("." .. packageName, CURRENT_MODULE_NAME), packageName)
-end
-
-local GameObject = cc.GameObject
-local ccmt = {}
-ccmt.__call = function(self, target)
-    if target then
-        return GameObject.extend(target)
+local drawPolygon = DrawNode.drawPolygon
+function DrawNode:drawPolygon(points, params)
+    local segments = #points
+    fillColor = cc.c4f(1,1,1,1)
+    borderWidth  = 0
+    borderColor  = cc.c4f(0,0,0,1)
+    if params then
+        if params.fillColor then fillColor = params.fillColor end
+        if params.borderWidth then borderWidth = params.borderWidth end
+        if params.borderColor then borderColor = params.borderColor end
     end
-    printError("cc() - invalid target")
+    drawPolygon(self, points, #points, fillColor, borderWidth, borderColor)
+    return self
 end
-setmetatable(cc, ccmt)
 
--- load MVC
-cc.mvc = import(".mvc.init")
+local drawDot = DrawNode.drawDot
+function DrawNode:drawDot(point, radius, color)
+    drawDot(self, point, radius, color)
+    return self
+end
 
--- load ui library
-cc.ui = import(".ui.init")
-
--- load net library
-cc.net = import(".net.init")
+local clear = DrawNode.clear
+function DrawNode:clear()
+    clear(self)
+    return self
+end

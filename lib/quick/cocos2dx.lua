@@ -24,44 +24,32 @@ THE SOFTWARE.
 
 --[[--
 
-初始化 cc 扩展
+针对 cocos2d-x 的一些封装和扩展
 
-cc 扩展在 cocos2dx C++ API 和 quick 基本模块的基础上，提供了符合脚本风格的事件接口、组件架构等扩展。
+预定义的节点事件：
+
+-   cc.NODE_EVENT - enter, exit 等事件
+-   cc.NODE_ENTER_FRAME_EVENT - 帧事件
+-   cc.NODE_TOUCH_EVENT - 触摸事件
+-   cc.NODE_TOUCH_CAPTURE_EVENT - 捕获触摸事件
+
+预定义的层事件：
+
+-   cc.ACCELERATE_EVENT - 重力感应事件
+-   cc.KEYPAD_EVENT - 硬件按键事件
+
+预定义的触摸模式：
+
+-   cc.TOUCH_MODE_ALL_AT_ONCE - 多点触摸
+-   cc.TOUCH_MODE_ONE_BY_ONE - 单点触摸
 
 ]]
 
-local CURRENT_MODULE_NAME = ...
+local p = cc.PACKAGE_NAME .. ".cocos2dx."
 
--- init base classes
-cc.Registry   = import(".Registry")
-cc.GameObject = import(".GameObject")
-cc.EventProxy = import(".EventProxy")
-cc.Component  = import(".components.Component")
-
--- init components
-local components = {
-    "components.behavior.StateMachine",
-    "components.behavior.EventProtocol",
-}
-for _, packageName in ipairs(components) do
-    cc.Registry.add(import("." .. packageName, CURRENT_MODULE_NAME), packageName)
-end
-
-local GameObject = cc.GameObject
-local ccmt = {}
-ccmt.__call = function(self, target)
-    if target then
-        return GameObject.extend(target)
-    end
-    printError("cc() - invalid target")
-end
-setmetatable(cc, ccmt)
-
--- load MVC
-cc.mvc = import(".mvc.init")
-
--- load ui library
-cc.ui = import(".ui.init")
-
--- load net library
-cc.net = import(".net.init")
+require(p .. "Event")
+require(p .. "NodeEx")
+require(p .. "SceneEx")
+require(p .. "SpriteEx")
+require(p .. "DrawNodeEx")
+require(p .. "DBCCArmatureNodeEx")
