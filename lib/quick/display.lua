@@ -1316,6 +1316,7 @@ function display.addSpriteFrames(plistFilename, image, handler)
         asyncHandler = function()
             local texture = sharedTextureCache:getTextureForKey(image)
             assert(texture, string.format("The texture %s, %s is unavailable.", plistFilename, image))
+            --print('sharedSpriteFrameCache.addSpriteFrames:', plistFilename, texture)
             sharedSpriteFrameCache:addSpriteFrames(plistFilename, texture)
             handler(plistFilename, image)
         end
@@ -1331,8 +1332,10 @@ function display.addSpriteFrames(plistFilename, image, handler)
         cc.Texture2D:setDefaultAlphaPixelFormat(cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A8888)
     else
         if async then
+            --print('sharedTextureCache:addImageAsync:', image)
             sharedTextureCache:addImageAsync(image, asyncHandler)
         else
+            --print('sharedSpriteFrameCache:addSpriteFrames:', plistFilename, image)
             sharedSpriteFrameCache:addSpriteFrames(plistFilename, image)
         end
     end
