@@ -23,6 +23,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module UIListView
+
 --[[--
 
 quick 列表控件
@@ -54,6 +57,13 @@ UIListView.ALIGNMENT_TOP			= 3
 UIListView.ALIGNMENT_BOTTOM			= 4
 UIListView.ALIGNMENT_HCENTER		= 5
 
+-- start --
+
+--------------------------------
+-- UIListView构建函数
+-- @function [parent=#UIListView] new
+-- @param table params 参数表
+
 --[[--
 
 UIListView构建函数
@@ -72,10 +82,9 @@ UIListView构建函数
 -   bgScale9 背景图是否可缩放
 -	capInsets 缩放区域
 
-
-@param table params 参数表
-
 ]]
+-- end --
+
 function UIListView:ctor(params)
 	UIListView.super.ctor(self, params)
 
@@ -100,50 +109,54 @@ function UIListView:ctor(params)
 	self.itemsFree_ = {}
 	self.delegate_ = {}
 	self.redundancyViewVal = 0 --异步的视图两个方向上的冗余大小,横向代表宽,竖向代表高
-	self.nTest = 0
+
+	self.args_ = {params}
 end
 
 function UIListView:onCleanup()
 	self:releaseAllFreeItems_()
 end
 
---[[--
+-- start --
 
-列表控件触摸注册函数
+--------------------------------
+-- 列表控件触摸注册函数
+-- @function [parent=#UIListView] onTouch
+-- @param function listener 触摸临听函数
+-- @return UIListView#UIListView  self 自身
 
-@param function listener 触摸临听函数
+-- end --
 
-@return UIListView self 自身
-
-]]
 function UIListView:onTouch(listener)
 	self.touchListener_ = listener
 
 	return self
 end
 
---[[--
+-- start --
 
-列表控件设置所有listItem中content的对齐方式
+--------------------------------
+-- 列表控件设置所有listItem中content的对齐方式
+-- @function [parent=#UIListView] setAlignment
+-- @param number align 对
+-- @return UIListView#UIListView  self 自身
 
-@param number align 对
+-- end --
 
-@return UIListView self 自身
-
-]]
 function UIListView:setAlignment(align)
 	self.alignment = align
 end
 
---[[--
+-- start --
 
-创建一个新的listViewItem项
+--------------------------------
+-- 创建一个新的listViewItem项
+-- @function [parent=#UIListView] newItem
+-- @param node item 要放到listViewItem中的内容content
+-- @return UIListViewItem#UIListViewItem 
 
-@param node item 要放到listViewItem中的内容content
+-- end --
 
-@return UIListViewItem
-
-]]
 function UIListView:newItem(item)
 	item = UIListViewItem.new(item)
 	item:setDirction(self.direction)
@@ -152,13 +165,15 @@ function UIListView:newItem(item)
 	return item
 end
 
---[[--
+-- start --
 
-设置显示区域
+--------------------------------
+-- 设置显示区域
+-- @function [parent=#UIListView] setViewRect
+-- @return UIListView#UIListView  self
 
-@return UIListView self
+-- end --
 
-]]
 function UIListView:setViewRect(viewRect)
 	if UIScrollView.DIRECTION_VERTICAL == self.direction then
 		self.redundancyViewVal = viewRect.height
@@ -167,6 +182,8 @@ function UIListView:setViewRect(viewRect)
 	end
 
 	UIListView.super.setViewRect(self, viewRect)
+
+	return self
 end
 
 function UIListView:itemSizeChangeListener(listItem, newSize, oldSize)
@@ -259,16 +276,17 @@ function UIListView:scrollListener(event)
 
 end
 
---[[--
+-- start --
 
-在列表项中添加一项
+--------------------------------
+-- 在列表项中添加一项
+-- @function [parent=#UIListView] addItem
+-- @param node listItem 要添加的项
+-- @param integer pos 要添加的位置,默认添加到最后
+-- @return UIListView#UIListView 
 
-@param node listItem 要添加的项
-@param [integer pos] 要添加的位置
+-- end --
 
-@return UIListView
-
-]]
 function UIListView:addItem(listItem, pos)
 	self:modifyItemSizeIf_(listItem)
 
@@ -282,16 +300,17 @@ function UIListView:addItem(listItem, pos)
 	return self
 end
 
---[[--
+-- start --
 
-在列表项中移除一项
+--------------------------------
+-- 在列表项中移除一项
+-- @function [parent=#UIListView] removeItem
+-- @param node listItem 要移除的项
+-- @param boolean bAni 是否要显示移除动画
+-- @return UIListView#UIListView 
 
-@param node listItem 要移除的项
-@param [boolean bAni] 是否要显示移除动画
+-- end --
 
-@return UIListView
-
-]]
 function UIListView:removeItem(listItem, bAni)
 	assert(not self.bAsyncLoad, "UIListView:removeItem() - syncload not support remove")
 
@@ -311,6 +330,10 @@ function UIListView:removeItem(listItem, bAni)
 
 	self.size.width = self.size.width - itemW
 	self.size.height = self.size.height - itemH
+
+	if 0 == table.nums(self.items_) then
+		return
+	end
 	if UIScrollView.DIRECTION_VERTICAL == self.direction then
 		self:moveItems(1, pos - 1, -itemW, -itemH, bAni)
 	else
@@ -320,29 +343,32 @@ function UIListView:removeItem(listItem, bAni)
 	return self
 end
 
---[[--
+-- start --
 
-移除所有的项
+--------------------------------
+-- 移除所有的项
+-- @function [parent=#UIListView] removeAllItems
+-- @return integer#integer 
 
-@return integer
+-- end --
 
-]]
 function UIListView:removeAllItems()
-	self.container:removeAllChildren()
+    self.container:removeAllChildren()
     self.items_ = {}
 
     return self
 end
 
---[[--
+-- start --
 
-取某项在列表控件中的位置
+--------------------------------
+-- 取某项在列表控件中的位置
+-- @function [parent=#UIListView] getItemPos
+-- @param node listItem 列表项
+-- @return integer#integer 
 
-@param node listItem 列表项
+-- end --
 
-@return integer
-
-]]
 function UIListView:getItemPos(listItem)
 	for i,v in ipairs(self.items_) do
 		if v == listItem then
@@ -351,15 +377,16 @@ function UIListView:getItemPos(listItem)
 	end
 end
 
---[[--
+-- start --
 
-判断某项是否在列表控件的显示区域中
+--------------------------------
+-- 判断某项是否在列表控件的显示区域中
+-- @function [parent=#UIListView] isItemInViewRect
+-- @param integer pos 列表项位置
+-- @return boolean#boolean 
 
-@param integer pos 列表项位置
+-- end --
 
-@return boolean
-
-]]
 function UIListView:isItemInViewRect(pos)
 	local item
 	if "number" == type(pos) then
@@ -381,13 +408,15 @@ function UIListView:isItemInViewRect(pos)
 	return cc.rectIntersectsRect(self.viewRect_, bound)
 end
 
---[[--
+-- start --
 
-加载列表
+--------------------------------
+-- 加载列表
+-- @function [parent=#UIListView] reload
+-- @return UIListView#UIListView 
 
-@return UIListView
+-- end --
 
-]]
 function UIListView:reload()
 	if self.bAsyncLoad then
 		self:asyncLoad_()
@@ -398,15 +427,16 @@ function UIListView:reload()
 	return self
 end
 
---[[--
+-- start --
 
-取一个空闲项出来,如果没有返回空
+--------------------------------
+-- 取一个空闲项出来,如果没有返回空
+-- @function [parent=#UIListView] dequeueItem
+-- @return UIListViewItem#UIListViewItem  item
+-- @see UIListViewItem
 
-@return UIListViewItem item
+-- end --
 
-@see UIListViewItem
-
-]]
 function UIListView:dequeueItem()
 	if #self.itemsFree_ < 1 then
 		return
@@ -663,19 +693,38 @@ end
 
 ]]
 function UIListView:increaseOrReduceItem_()
-	-- if self.nTest > 0 then
-	-- 	return
-	-- end
-	-- print("enter increase reduceItem")
 
 	if 0 == #self.items_ then
 		print("ERROR items count is 0")
 		return
 	end
 
+	local getContainerCascadeBoundingBox = function ()
+		local boundingBox
+		for i, item in ipairs(self.items_) do
+			local w,h = item:getItemSize()
+			local x,y = item:getPosition()
+			local anchor = item:getAnchorPoint()
+			x = x - anchor.x * w
+			y = y - anchor.y * h
+
+			if boundingBox then
+				boundingBox = cc.rectUnion(boundingBox, cc.rect(x, y, w, h))
+			else
+				boundingBox = cc.rect(x, y, w, h)
+			end
+		end
+
+		local point = self.container:convertToWorldSpace(cc.p(boundingBox.x, boundingBox.y))
+		boundingBox.x = point.x
+		boundingBox.y = point.y
+		return boundingBox
+	end
+
 	local count = self.delegate_[UIListView.DELEGATE](self, UIListView.COUNT_TAG)
 	local nNeedAdjust = 2 --作为是否还需要再增加或减少item的标志,2表示上下两个方向或左右都需要调整
-	local cascadeBound = self.container:getCascadeBoundingBox()
+	local cascadeBound = getContainerCascadeBoundingBox()
+	local localPos = self:convertToNodeSpace(cc.p(cascadeBound.x, cascadeBound.y))
 	local item
 	local itemW, itemH
 
@@ -683,16 +732,10 @@ function UIListView:increaseOrReduceItem_()
 	-- dump(cascadeBound, "increaseOrReduceItem_ cascadeBound:")
 	-- dump(self.viewRect_, "increaseOrReduceItem_ viewRect:")
 
-	if self.bTest1 then
-		print("===================================================")
-		return
-		-- dump(cascadeBound, "cascadeBound:")
-	end
-
 	if UIScrollView.DIRECTION_VERTICAL == self.direction then
 
 		--ahead part of view
-		local disH = cascadeBound.y + cascadeBound.height - self.viewRect_.y - self.viewRect_.height
+		local disH = localPos.y + cascadeBound.height - self.viewRect_.y - self.viewRect_.height
 		local tempIdx
 		item = self.items_[1]
 		if not item then
@@ -721,12 +764,8 @@ function UIListView:increaseOrReduceItem_()
 			end
 		end
 
-		if self.bTest1 then
-			-- dump(cascadeBound, "cascadeBound:")
-		end
-
 		--part after view
-		disH = self.viewRect_.y - cascadeBound.y
+		disH = self.viewRect_.y - localPos.y
 		item = self.items_[#self.items_]
 		if not item then
 			return
@@ -754,7 +793,7 @@ function UIListView:increaseOrReduceItem_()
 		end
 	else
 		--left part of view
-		local disW = self.viewRect_.x - cascadeBound.x
+		local disW = self.viewRect_.x - localPos.x
 		item = self.items_[1]
 		local tempIdx = item.idx_
 		if disW > self.redundancyViewVal then
@@ -778,7 +817,7 @@ function UIListView:increaseOrReduceItem_()
 		end
 
 		--right part of view
-		disW = cascadeBound.x + cascadeBound.width - self.viewRect_.x - self.viewRect_.width
+		disW = localPos.x + cascadeBound.width - self.viewRect_.x - self.viewRect_.width
 		item = self.items_[#self.items_]
 		tempIdx = item.idx_
 		if disW > self.redundancyViewVal then
@@ -859,13 +898,15 @@ function UIListView:asyncLoad_()
 	return self
 end
 
---[[--
+-- start --
 
-设置delegate函数
+--------------------------------
+-- 设置delegate函数
+-- @function [parent=#UIListView] setDelegate
+-- @return UIListView#UIListView 
 
-@return UIListView
+-- end --
 
-]]
 function UIListView:setDelegate(delegate)
 	self.delegate_[UIListView.DELEGATE] = delegate
 end
@@ -925,7 +966,7 @@ end
 
 ]]
 function UIListView:loadOneItem_(originPoint, idx, bBefore)
-	print("UIListView loadOneItem idx:" .. idx)
+	-- print("UIListView loadOneItem idx:" .. idx)
 	-- dump(originPoint, "originPoint:")
 
 	local itemW, itemH = 0, 0
@@ -997,9 +1038,7 @@ end
 
 ]]
 function UIListView:unloadOneItem_(idx)
-	print("UIListView unloadOneItem idx:" .. idx)
-
-	self.nTest = self.nTest + 1
+	-- print("UIListView unloadOneItem idx:" .. idx)
 
 	local item = self.items_[1]
 
@@ -1017,7 +1056,7 @@ function UIListView:unloadOneItem_(idx)
 	table.remove(self.items_, unloadIdx)
 	self:addFreeItem_(item)
 	-- item:removeFromParentAndCleanup(false)
-	self.container:removeChild(item)
+	self.container:removeChild(item, false)
 
 	self.delegate_[UIListView.DELEGATE](self, UIListView.UNLOAD_CELL_TAG, idx)
 end
@@ -1046,6 +1085,24 @@ function UIListView:releaseAllFreeItems_()
 	self.itemsFree_ = {}
 end
 
+function UIListView:createCloneInstance_()
+    return UIListView.new(unpack(self.args_))
+end
 
+function UIListView:copyClonedWidgetChildren_(node)
+    local children = node.items_
+    if not children or 0 == #children then
+        return
+    end
+
+    for i, child in ipairs(children) do
+        local cloneItem = self:newItem()
+        local content = child:getContent()
+        local cloneContent = content:clone()
+        cloneItem:addContent(cloneContent)
+        cloneItem:copySpecialProperties_(child)
+        self:addItem(cloneItem)
+    end
+end
 
 return UIListView

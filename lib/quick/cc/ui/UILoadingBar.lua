@@ -23,6 +23,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module UILoadingBar
+
 --[[--
 
 quick 进度控件
@@ -37,6 +40,13 @@ end)
 UILoadingBar.DIRECTION_LEFT_TO_RIGHT = 0
 UILoadingBar.DIRECTION_RIGHT_TO_LEFT = 1
 
+-- start --
+
+--------------------------------
+-- 进度控件构建函数
+-- @function [parent=#UILoadingBar] new
+-- @param table params 参数
+
 --[[--
 
 进度控件构建函数
@@ -50,17 +60,18 @@ UILoadingBar.DIRECTION_RIGHT_TO_LEFT = 1
 -   percent 进度值 0到100
 -	direction 方向，默认值从左到右
 
-@param table params 参数
-
 ]]
+-- end --
+
 function UILoadingBar:ctor(params)
 	if params.scale9 then
 		self.scale9 = true
+		local scale9sp = ccui.Scale9Sprite or cc.Scale9Sprite
 		if string.byte(params.image) == 35 then
-			self.bar = cc.Scale9Sprite:createWithSpriteFrameName(
+			self.bar = scale9sp:createWithSpriteFrameName(
 				string.sub(params.image, 2), params.capInsets);
 		else
-			self.bar = cc.Scale9Sprite:create(
+			self.bar = scale9sp:create(
 				params.capInsets, params.image)
 		end
 		self:setClippingRegion(cc.rect(0, 0, params.viewRect.width, params.viewRect.height))
@@ -75,22 +86,25 @@ function UILoadingBar:ctor(params)
 	self.bar:setPosition(0, 0)
 	self:setPercent(params.percent or 0)
 	self:addChild(self.bar)
+
+	self.args_ = {params}
 end
 
+-- start --
 
---[[--
+--------------------------------
+-- 设置进度控件的进度
+-- @function [parent=#UILoadingBar] setPercent
+-- @param number percent 进度值 0到100
+-- @return UILoadingBar#UILoadingBar 
 
-设置进度控件的进度
+-- end --
 
-@param number percent 进度值 0到100
-
-@return UILoadingBar
-
-]]
 function UILoadingBar:setPercent(percent)
+	self.percent_ = percent
 	local rect = cc.rect(self.viewRect_.x, self.viewRect_.y,
 		self.viewRect_.width, self.viewRect_.height)
-	local newWidth = rect.width*percent/100
+	local newWidth = rect.width*self.percent_/100
 
 	rect.x = 0
 	rect.y = 0
@@ -113,15 +127,29 @@ function UILoadingBar:setPercent(percent)
 	return self
 end
 
---[[--
+-- start --
 
-设置进度控件的方向
+--------------------------------
+-- 得到进度控件的进度
+-- @function [parent=#UILoadingBar] getPercent
+-- @return number 进度值
 
-@param integer dir 进度的方向
+-- end --
 
-@return UILoadingBar
+function UILoadingBar:getPercent()
+	return self.percent_
+end
 
-]]
+-- start --
+
+--------------------------------
+-- 设置进度控件的方向
+-- @function [parent=#UILoadingBar] setDirction
+-- @param integer dir 进度的方向
+-- @return UILoadingBar#UILoadingBar 
+
+-- end --
+
 function UILoadingBar:setDirction(dir)
 	self.direction_ = dir
 	if UILoadingBar.DIRECTION_LEFT_TO_RIGHT ~= self.direction_ then
@@ -133,20 +161,27 @@ function UILoadingBar:setDirction(dir)
 	return self
 end
 
---[[--
+-- start --
 
-设置进度控件的显示区域
+--------------------------------
+-- 设置进度控件的显示区域
+-- @function [parent=#UILoadingBar] setViewRect
+-- @param table rect 显示区域
+-- @return UILoadingBar#UILoadingBar 
 
-@param table rect 显示区域
+-- end --
 
-@return UILoadingBar
-
-]]
 function UILoadingBar:setViewRect(rect)
 	self.viewRect_ = rect
 	self.bar:setContentSize(rect.width, rect.height)
 
 	return self
+end
+
+function UILoadingBar:createCloneInstance_()
+	self.args_.viewRect = self.viewRect_
+	self.args_.direction = self.direction_
+	return UILoadingBar.new(unpack(self.args_))
 end
 
 return UILoadingBar

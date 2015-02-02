@@ -23,6 +23,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module UIButton
+
 --[[--
 
 quick Button控件
@@ -41,27 +44,33 @@ UIButton.STATE_CHANGED_EVENT = "STATE_CHANGED_EVENT"
 UIButton.IMAGE_ZORDER = -100
 UIButton.LABEL_ZORDER = 0
 
---[[--
+-- start --
 
-UIButton构建函数
+--------------------------------
+-- UIButton构建函数
+-- @function [parent=#UIButton] new
+-- @param table events 按钮状态表
+-- @param string initialState 初始状态
+-- @param table options 参数表
 
-@param table events 按钮状态表
-@param string initialState 初始状态
-@param table options 参数表
+-- end --
 
-]]
 function UIButton:ctor(events, initialState, options)
+    self.args_ = {events, initialState, options}
+
     self.fsm_ = {}
     cc(self.fsm_)
         :addComponent("components.behavior.StateMachine")
         :exportMethods()
-    self.fsm_:setupState({
+
+    self.fsmState_ = {
         initial = {state = initialState, event = "startup", defer = false},
         events = events,
         callbacks = {
             onchangestate = handler(self, self.onChangeState_),
         }
-    })
+    }
+    self.fsm_:setupState(self.fsmState_)
 
     makeUIControl_(self)
     self:setLayoutSizePolicy(display.FIXED_SIZE, display.FIXED_SIZE)
@@ -97,17 +106,18 @@ function UIButton:ctor(events, initialState, options)
     end)
 end
 
---[[--
+-- start --
 
-停靠位置
+--------------------------------
+-- 停靠位置
+-- @function [parent=#UIButton] align
+-- @param number align 锚点位置
+-- @param number x
+-- @param number y
+-- @return UIButton#UIButton 
 
-@param number align 锚点位置
-@param number x
-@param number y
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:align(align, x, y)
     display.align(self, align, x, y)
     self:updateButtonImage_()
@@ -120,17 +130,18 @@ function UIButton:align(align, x, y)
     return self
 end
 
---[[--
+-- start --
 
-设置按钮特定状态的图片
+--------------------------------
+-- 设置按钮特定状态的图片
+-- @function [parent=#UIButton] setButtonImage
+-- @param string state 状态
+-- @param string image 图片路径
+-- @param boolean ignoreEmpty 是否忽略空的图片路径
+-- @return UIButton#UIButton 
 
-@param string state 状态
-@param string image 图片路径
-@param boolean ignoreEmpty 是否忽略空的图片路径
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:setButtonImage(state, image, ignoreEmpty)
     if ignoreEmpty and image == nil then return end
     self.images_[state] = image
@@ -140,16 +151,17 @@ function UIButton:setButtonImage(state, image, ignoreEmpty)
     return self
 end
 
---[[--
+-- start --
 
-设置按钮特定状态的文字node
+--------------------------------
+-- 设置按钮特定状态的文字node
+-- @function [parent=#UIButton] setButtonLabel
+-- @param string state 状态
+-- @param node label 文字node
+-- @return UIButton#UIButton 
 
-@param string state 状态
-@param node label 文字node
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:setButtonLabel(state, label)
     if not label then
         label = state
@@ -167,15 +179,16 @@ function UIButton:setButtonLabel(state, label)
     return self
 end
 
---[[--
+-- start --
 
-返回按钮特定状态的文字
+--------------------------------
+-- 返回按钮特定状态的文字
+-- @function [parent=#UIButton] getButtonLabel
+-- @param string state 状态
+-- @return node#node  文字label
 
-@param string state 状态
+-- end --
 
-@return node 文字label
-
-]]
 function UIButton:getButtonLabel(state)
     if not state then
         state = self:getDefaultState_()
@@ -184,16 +197,17 @@ function UIButton:getButtonLabel(state)
     return self.labels_[state]
 end
 
---[[--
+-- start --
 
-设置按钮特定状态的文字
+--------------------------------
+-- 设置按钮特定状态的文字
+-- @function [parent=#UIButton] setButtonLabelString
+-- @param string state 状态
+-- @param string text 文字
+-- @return UIButton#UIButton 
 
-@param string state 状态
-@param string text 文字
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:setButtonLabelString(state, text)
     assert(self.labels_ ~= nil, "UIButton:setButtonLabelString() - not add label")
     if text == nil then
@@ -208,70 +222,77 @@ function UIButton:setButtonLabelString(state, text)
     return self
 end
 
---[[--
+-- start --
 
-返回文字标签的偏移
+--------------------------------
+-- 返回文字标签的偏移
+-- @function [parent=#UIButton] getButtonLabelOffset
+-- @return number#number  x
+-- @return number#number  y
 
-@return number x
-@return number y
+-- end --
 
-]]
 function UIButton:getButtonLabelOffset()
     return self.labelOffset_[1], self.labelOffset_[2]
 end
 
---[[--
+-- start --
 
-设置文字标签的偏移
+--------------------------------
+-- 设置文字标签的偏移
+-- @function [parent=#UIButton] setButtonLabelOffset
+-- @param number x
+-- @param number y
+-- @return UIButton#UIButton 
 
-@param number x
-@param number y
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:setButtonLabelOffset(ox, oy)
     self.labelOffset_ = {ox, oy}
     self:updateButtonLable_()
     return self
 end
 
---[[--
+-- start --
 
-得到文字标签的停靠方式
+--------------------------------
+-- 得到文字标签的停靠方式
+-- @function [parent=#UIButton] getButtonLabelAlignment
+-- @return number#number 
 
-@return number
+-- end --
 
-]]
 function UIButton:getButtonLabelAlignment()
     return self.labelAlign_
 end
 
---[[--
+-- start --
 
-设置文字标签的停靠方式
+--------------------------------
+-- 设置文字标签的停靠方式
+-- @function [parent=#UIButton] setButtonLabelAlignment
+-- @param number align
+-- @return UIButton#UIButton 
 
-@param number align
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:setButtonLabelAlignment(align)
     self.labelAlign_ = align
     self:updateButtonLable_()
     return self
 end
 
---[[--
+-- start --
 
-设置按钮的大小
+--------------------------------
+-- 设置按钮的大小
+-- @function [parent=#UIButton] setButtonSize
+-- @param number width
+-- @param number height
+-- @return UIButton#UIButton 
 
-@param number width
-@param number height
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:setButtonSize(width, height)
     -- assert(self.scale9_, "UIButton:setButtonSize() - can't change size for non-scale9 button")
     self.scale9Size_ = {width, height}
@@ -280,8 +301,10 @@ function UIButton:setButtonSize(width, height)
             v:setContentSize(cc.size(self.scale9Size_[1], self.scale9Size_[2]))
         else
             local size = v:getContentSize()
-            local scaleX = v:getScaleX()
-            local scaleY = v:getScaleY()
+            local scaleX = 1
+            local scaleY = 1
+            -- scaleX = v:getScaleX()
+            -- scaleY = v:getScaleY()
             scaleX = scaleX * self.scale9Size_[1]/size.width
             scaleY = scaleY * self.scale9Size_[2]/size.height
             v:setScaleX(scaleX)
@@ -291,15 +314,16 @@ function UIButton:setButtonSize(width, height)
     return self
 end
 
---[[--
+-- start --
 
-设置按钮是否有效
+--------------------------------
+-- 设置按钮是否有效
+-- @function [parent=#UIButton] setButtonEnabled
+-- @param boolean enabled 是否有效
+-- @return UIButton#UIButton 
 
-@param boolean enabled 是否有效
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:setButtonEnabled(enabled)
     self:setTouchEnabled(enabled)
     if enabled and self.fsm_:canDoEvent("enable") then
@@ -312,13 +336,15 @@ function UIButton:setButtonEnabled(enabled)
     return self
 end
 
---[[--
+-- start --
 
-返回按钮是否有效
+--------------------------------
+-- 返回按钮是否有效
+-- @function [parent=#UIButton] isButtonEnabled
+-- @return boolean#boolean 
 
-@return boolean
+-- end --
 
-]]
 function UIButton:isButtonEnabled()
     return self.fsm_:canDoEvent("disable")
 end
@@ -327,15 +353,16 @@ function UIButton:addButtonClickedEventListener(callback)
     return self:addEventListener(UIButton.CLICKED_EVENT, callback)
 end
 
---[[--
+-- start --
 
-注册用户点击监听
+--------------------------------
+-- 注册用户点击监听
+-- @function [parent=#UIButton] onButtonClicked
+-- @param function callback 监听函数
+-- @return UIButton#UIButton 
 
-@param function callback 监听函数
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:onButtonClicked(callback)
     self:addButtonClickedEventListener(callback)
     return self
@@ -345,15 +372,16 @@ function UIButton:addButtonPressedEventListener(callback)
     return self:addEventListener(UIButton.PRESSED_EVENT, callback)
 end
 
---[[--
+-- start --
 
-注册用户按下监听
+--------------------------------
+-- 注册用户按下监听
+-- @function [parent=#UIButton] onButtonPressed
+-- @param function callback 监听函数
+-- @return UIButton#UIButton 
 
-@param function callback 监听函数
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:onButtonPressed(callback)
     self:addButtonPressedEventListener(callback)
     return self
@@ -363,15 +391,16 @@ function UIButton:addButtonReleaseEventListener(callback)
     return self:addEventListener(UIButton.RELEASE_EVENT, callback)
 end
 
---[[--
+-- start --
 
-注册用户释放监听
+--------------------------------
+-- 注册用户释放监听
+-- @function [parent=#UIButton] onButtonRelease
+-- @param function callback 监听函数
+-- @return UIButton#UIButton 
 
-@param function callback 监听函数
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:onButtonRelease(callback)
     self:addButtonReleaseEventListener(callback)
     return self
@@ -381,15 +410,16 @@ function UIButton:addButtonStateChangedEventListener(callback)
     return self:addEventListener(UIButton.STATE_CHANGED_EVENT, callback)
 end
 
---[[--
+-- start --
 
-注册按钮状态变化监听
+--------------------------------
+-- 注册按钮状态变化监听
+-- @function [parent=#UIButton] onButtonStateChanged
+-- @param function callback 监听函数
+-- @return UIButton#UIButton 
 
-@param function callback 监听函数
+-- end --
 
-@return UIButton
-
-]]
 function UIButton:onButtonStateChanged(callback)
     self:addButtonStateChangedEventListener(callback)
     return self
@@ -516,6 +546,29 @@ function UIButton:checkTouchInSprite_(x, y)
     else
         return self:getCascadeBoundingBox():containsPoint(cc.p(x, y))
     end
+end
+
+function UIButton:createCloneInstance_()
+    return UIButton.new(unpack(self.args_))
+end
+
+function UIButton:copyClonedWidgetChildren_(node)
+    for state, label in pairs(node.labels_) do
+        self:setButtonLabel(state, label:clone())
+    end
+
+    self:updateButtonImage_()
+    self:updateButtonLable_()
+end
+
+function UIButton:copySpecialProperties_(node)
+    if node.scale9Size_ then
+        self:setButtonSize(unpack(node.scale9Size_))
+    end
+    self.labelAlign_ = node.labelAlign_
+    self.labelOffset_ = clone(node.labelOffset_)
+    self.images_ = clone(node.images_)
+    self:setButtonEnabled(node:isButtonEnabled())
 end
 
 return UIButton

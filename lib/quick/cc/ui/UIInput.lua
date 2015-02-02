@@ -23,6 +23,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module UIInput
+
 --[[--
 
 quick 输入控件
@@ -45,15 +48,35 @@ UIInput = class("UIInput", function(options)
     return inputLabel
 end)
 
+-- start --
+
+--------------------------------
+-- 输入构建函数
+-- @function [parent=#UIInput] new
+-- @param table params 参数表格对象
+-- @return mixed#mixed  editbox/textfield文字输入框
+
 --[[--
 
 输入构建函数
 
+创建一个文字输入框，并返回 EditBox/textfield 对象。
+
+options参灵敏:
+-   UIInputType: 1或nil 表示创建editbox输入控件
+-   UIInputType: 2 表示创建textfield输入控件
+
 ]]
+-- end --
+
 function UIInput:ctor(options)
+
+    -- make editbox and textfield have same getText function
     if 2 == options.UIInputType then
         self.getText = self.getStringValue
     end
+
+    self.args_ = options
 end
 
 
@@ -142,7 +165,13 @@ function UIInput.newEditBox_(params)
         imageDisabled = display.newScale9Sprite(imageDisabled)
     end
 
-    local editbox = cc.EditBox:create(params.size, imageNormal, imagePressed, imageDisabled)
+    local editboxCls
+    if cc.bPlugin_ then
+        editboxCls = ccui.EditBox
+    else
+        editboxCls = cc.EditBox
+    end
+    local editbox = editboxCls:create(params.size, imageNormal, imagePressed, imageDisabled)
 
     if editbox then
         if params.listener then
@@ -156,10 +185,62 @@ function UIInput.newEditBox_(params)
     return editbox
 end
 
+--[[--
+
+创建一个文字输入框，并返回 Textfield 对象。
+
+可用参数：
+
+-   listener: 回调函数
+-   size: 输入框的尺寸，用 cc.size(宽度, 高度) 创建
+-   x, y: 坐标（可选）
+-   placeHolder: 占位符(可选)
+-   text: 输入文字(可选)
+-   font: 字体
+-   fontSize: 字体大小
+-   maxLength:
+-   passwordEnable:开启密码模式
+-   passwordChar:密码代替字符
+
+~~~ lua
+
+local function onEdit(textfield, eventType)
+    if event == 0 then
+        -- ATTACH_WITH_IME
+    elseif event == 1 then
+        -- DETACH_WITH_IME
+    elseif event == 2 then
+        -- INSERT_TEXT
+    elseif event == 3 then
+        -- DELETE_BACKWARD
+    end
+end
+
+local textfield = UIInput.new({
+    UIInputType = 2,
+    listener = onEdit,
+    size = cc.size(200, 40)
+})
+
+~~~
+
+@param table params 参数表格对象
+
+@return Textfield 文字输入框
+
+]]
 function UIInput.newTextField_(params)
-    local editbox = cc.TextField:create()
+    local textfieldCls
+    if cc.bPlugin_ then
+        textfieldCls = ccui.TextField
+    else
+        textfieldCls = cc.TextField
+    end
+    local editbox = textfieldCls:create()
     editbox:setPlaceHolder(params.placeHolder)
-    editbox:setPosition(params.x, params.y)
+    if params.x and params.y then
+        editbox:setPosition(params.x, params.y)
+    end
     if params.listener then
         editbox:addEventListener(params.listener)
     end
@@ -167,7 +248,11 @@ function UIInput.newTextField_(params)
         editbox:setTextAreaSize(params.size)
     end
     if params.text then
-        editbox:setText(params.text)
+        if editbox.setString then
+            editbox:setString(params.text)
+        else
+            editbox:setText(params.text)
+        end
     end
     if params.font then
         editbox:setFontName(params.font)
@@ -187,6 +272,10 @@ function UIInput.newTextField_(params)
     end
 
     return editbox
+end
+
+function UIInput:createcloneInstance_()
+    return UIInput.new(unpack(self.args_))
 end
 
 return UIInput

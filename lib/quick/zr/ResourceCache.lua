@@ -94,7 +94,7 @@ function RC.inCache(typ, path, sceneName)
     return true
 end
 
--- 重新封装 display.newSprite ，提供将单张图片缓存的功能。
+-- 重新封装 display.newSprite ，提供将单张图片按场景缓存的功能。
 -- 这个封装不支持 SpriteFrameCache 中的碎图，其它参数完全相同。
 function RC.newSprite(sceneName, filename, x, y, params)
     assert(string.byte(filename) ~= 35, 
@@ -104,7 +104,7 @@ function RC.newSprite(sceneName, filename, x, y, params)
     return display.newSprite(fname, x, y, params)
 end
 
--- 重新封装 display.newScale9Sprite ，提供将 Scale9 单张图片缓存的功能。
+-- 重新封装 display.newScale9Sprite ，提供将 Scale9 单张图片按场景缓存的功能。
 -- 这个封装不支持 SpriteFrameCache 中的碎图，其它参数完全相同。
 function RC.newScale9Sprite(sceneName, filename, x, y, size, capInsets)
     assert(string.byte(filename) ~= 35, 
@@ -112,6 +112,20 @@ function RC.newScale9Sprite(sceneName, filename, x, y, size, capInsets)
     local fname = RM.normalizeFilePath(RM.T_TEX, filename)
     RC.recordPdir(sceneName, fname)
     return display.newScale9Sprite(fname, x, y, size, capInsets)
+end
+
+-- 重新封装 display.newBatchNode ，提供将图片按场景缓存的功能。
+function RC.newBatchNode(sceneName, filename, capacity)
+    local fname = RM.normalizeFilePath(RM.T_SF, filename)
+    RC.recordPdir(sceneName, fname)
+    return display.newBatchNode(fname, capacity)
+end
+
+-- 重新封装 display.newTilesSprite ，提供将图片按场景缓存的功能。
+function RC.newTilesSprite(sceneName, filename, rect)
+    local fname = RM.normalizeFilePath(RM.T_TEX, filename)
+    RC.recordPdir(sceneName, fname)
+    return display.newTilesSprite(fname, rect)
 end
 
 -- 将指定的单张图片按场景记录在缓存中

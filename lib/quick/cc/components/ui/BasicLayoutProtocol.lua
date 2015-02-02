@@ -1,5 +1,5 @@
 
-local Component = import("..Component")
+local Component = cc.Component
 local BasicLayoutProtocol = class("BasicLayoutProtocol", Component)
 
 local MAX = 999999

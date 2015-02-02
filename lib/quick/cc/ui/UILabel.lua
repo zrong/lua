@@ -23,6 +23,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module UILabel
+
 --[[--
 
 quick UILabel控件
@@ -48,35 +51,47 @@ UILabel.LABEL_TYPE_BM					= 1
 UILabel.LABEL_TYPE_TTF 					= 2
 
 
---[[--
+-- start --
 
-UILabel构建函数
+--------------------------------
+-- UILabel构建函数
+-- @function [parent=#UILabel] new
+-- @param table options 参数表
 
-@param table options 参数表
+-- end --
 
-]]
 function UILabel:ctor(options)
     makeUIControl_(self)
     self:setLayoutSizePolicy(display.FIXED_SIZE, display.FIXED_SIZE)
 
     self:align(display.LEFT_CENTER)
+
+    self.args_ = {options}
 end
 
---[[--
+-- start --
 
-UILabel设置控件大小
+--------------------------------
+-- UILabel设置控件大小
+-- @function [parent=#UILabel] setLayoutSize
+-- @param number width 宽度
+-- @param number height 高度
+-- @return UILabel#UILabel  自身
 
-@param number width 宽度
-@param number height 高度
+-- end --
 
-@return UILabel 自身
-
-]]
 function UILabel:setLayoutSize(width, height)
     self:getComponent("components.ui.LayoutProtocol"):setLayoutSize(width, height)
     return self
 end
 
+function UILabel:createCloneInstance_()
+    return UILabel.new(unpack(self.args_))
+end
+
+function UILabel:copyClonedWidgetChildren_(node)
+
+end
 
 -- private
 

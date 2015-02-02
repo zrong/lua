@@ -22,6 +22,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module functions
+
 --[[--
 
 提供一组常用函数，以及对 Lua 标准库的扩展
@@ -532,11 +535,18 @@ function handler(obj, method)
     end
 end
 
---[[--
 
-根据系统时间初始化随机数种子，让后续的 math.random() 返回更随机的值
+--------------------------------
+-- @module math
 
-]]
+-- start --
+
+--------------------------------
+-- 根据系统时间初始化随机数种子，让后续的 math.random() 返回更随机的值
+-- @function [parent=#math] newrandomseed
+
+-- end --
+
 function math.newrandomseed()
     local ok, socket = pcall(function()
         return require("socket")
@@ -544,7 +554,7 @@ function math.newrandomseed()
 
     if ok then
         -- 如果集成了 socket 模块，则使用 socket.gettime() 获取随机数种子
-        math.randomseed(socket.gettime() * 1000)
+        math.randomseed(socket.gettime())
     else
         math.randomseed(os.time())
     end
@@ -554,36 +564,57 @@ function math.newrandomseed()
     math.random()
 end
 
---[[--
+-- start --
 
-对数值进行四舍五入，如果不是数值则返回 0
+--------------------------------
+-- 对数值进行四舍五入，如果不是数值则返回 0
+-- @function [parent=#math] round
+-- @param number value 输入值
+-- @return number#number 
 
-@param number value 输入值
+-- end --
 
-@return number
-
-]]
 function math.round(value)
+    value = checknumber(value)
     return math.floor(value + 0.5)
 end
 
---[[--
+-- start --
 
-角度转弧度
+--------------------------------
+-- 角度转弧度
+-- @function [parent=#math] angle2radian
 
-]]
+-- end --
+
 function math.angle2radian(angle)
 	return angle*math.pi/180
 end
 
---[[--
+-- start --
 
-弧度转角度
+--------------------------------
+-- 弧度转角度
+-- @function [parent=#math] radian2angle
 
-]]
+-- end --
+
 function math.radian2angle(radian)
 	return radian/math.pi*180
 end
+
+
+
+--------------------------------
+-- @module io
+
+-- start --
+
+--------------------------------
+-- 检查指定的文件或目录是否存在，如果存在返回 true，否则返回 false
+-- @function [parent=#io] exists
+-- @param string path 要检查的文件或目录的完全路径
+-- @return boolean#boolean 
 
 --[[--
 
@@ -600,11 +631,10 @@ end
 
 ~~~
 
-@param string path 要检查的文件或目录的完全路径
-
-@return boolean
-
 ]]
+
+-- end --
+
 function io.exists(path)
     local file = io.open(path, "r")
     if file then
@@ -614,17 +644,24 @@ function io.exists(path)
     return false
 end
 
+-- start --
+
+--------------------------------
+-- 读取文件内容，返回包含文件内容的字符串，如果失败返回 nil
+-- @function [parent=#io] readfile
+-- @param string path 文件完全路径
+-- @return string#string 
+
 --[[--
 
 读取文件内容，返回包含文件内容的字符串，如果失败返回 nil
 
 io.readfile() 会一次性读取整个文件的内容，并返回一个字符串，因此该函数不适宜读取太大的文件。
 
-@param string path 文件完全路径
-
-@return string
-
 ]]
+
+-- end --
+
 function io.readfile(path)
     local file = io.open(path, "r")
     if file then
@@ -634,6 +671,16 @@ function io.readfile(path)
     end
     return nil
 end
+
+-- start --
+
+--------------------------------
+-- 以字符串内容写入文件，成功返回 true，失败返回 false
+-- @function [parent=#io] writefile
+-- @param string path 文件完全路径
+-- @param string content 要写入的内容
+-- @param string mode 写入模式，默认值为 "w+b"
+-- @return boolean#boolean 
 
 --[[--
 
@@ -648,13 +695,10 @@ end
 
 **Android 特别提示:** 在 Android 平台上，文件只能写入存储卡所在路径，assets 和 data 等目录都是无法写入的。
 
-@param string path 文件完全路径
-@param string content 要写入的内容
-@param [string mode] 写入模式，默认值为 "w+b"
-
-@return boolean
-
 ]]
+
+-- end --
+
 function io.writefile(path, content, mode)
     mode = mode or "w+b"
     local file = io.open(path, mode)
@@ -666,6 +710,14 @@ function io.writefile(path, content, mode)
         return false
     end
 end
+
+-- start --
+
+--------------------------------
+-- 拆分一个路径字符串，返回组成路径的各个部分
+-- @function [parent=#io] pathinfo
+-- @param string path 要分拆的路径字符串
+-- @return table#table 
 
 --[[--
 
@@ -683,11 +735,10 @@ local pathinfo  = io.pathinfo("/var/app/test/abc.png")
 
 ~~~
 
-@param string path 要分拆的路径字符串
-
-@return table
-
 ]]
+
+-- end --
+
 function io.pathinfo(path)
     local pos = string.len(path)
     local extpos = pos + 1
@@ -714,15 +765,16 @@ function io.pathinfo(path)
     }
 end
 
---[[--
+-- start --
 
-返回指定文件的大小，如果失败返回 false
+--------------------------------
+-- 返回指定文件的大小，如果失败返回 false
+-- @function [parent=#io] filesize
+-- @param string path 文件完全路径
+-- @return integer#integer 
 
-@param string path 文件完全路径
+-- end --
 
-@return integer
-
-]]
 function io.filesize(path)
     local size = false
     local file = io.open(path, "r")
@@ -735,17 +787,28 @@ function io.filesize(path)
     return size
 end
 
+
+--------------------------------
+-- @module table
+
+-- start --
+
+--------------------------------
+-- 计算表格包含的字段数量
+-- @function [parent=#table] nums
+-- @param table t 要检查的表格
+-- @return integer#integer 
+
 --[[--
 
 计算表格包含的字段数量
 
 Lua table 的 "#" 操作只对依次排序的数值下标数组有效，table.nums() 则计算 table 中所有不为 nil 的值的个数。
 
-@param table t 要检查的表格
-
-@return integer
-
 ]]
+
+-- end --
+
 function table.nums(t)
     local count = 0
     for k, v in pairs(t) do
@@ -753,6 +816,14 @@ function table.nums(t)
     end
     return count
 end
+
+-- start --
+
+--------------------------------
+-- 返回指定表格中的所有键
+-- @function [parent=#table] keys
+-- @param table hashtable 要检查的表格
+-- @return table#table 
 
 --[[--
 
@@ -766,11 +837,10 @@ local keys = table.keys(hashtable)
 
 ~~~
 
-@param table hashtable 要检查的表格
-
-@return table
-
 ]]
+
+-- end --
+
 function table.keys(hashtable)
     local keys = {}
     for k, v in pairs(hashtable) do
@@ -778,6 +848,14 @@ function table.keys(hashtable)
     end
     return keys
 end
+
+-- start --
+
+--------------------------------
+-- 返回指定表格中的所有值
+-- @function [parent=#table] values
+-- @param table hashtable 要检查的表格
+-- @return table#table 
 
 --[[--
 
@@ -791,11 +869,10 @@ local values = table.values(hashtable)
 
 ~~~
 
-@param table hashtable 要检查的表格
-
-@return table
-
 ]]
+
+-- end --
+
 function table.values(hashtable)
     local values = {}
     for k, v in pairs(hashtable) do
@@ -803,6 +880,14 @@ function table.values(hashtable)
     end
     return values
 end
+
+-- start --
+
+--------------------------------
+-- 将来源表格中所有键及其值复制到目标表格对象中，如果存在同名键，则覆盖其值
+-- @function [parent=#table] merge
+-- @param table dest 目标表格
+-- @param table src 来源表格
 
 --[[--
 
@@ -817,15 +902,24 @@ table.merge(dest, src)
 
 ~~~
 
-@param table dest 目标表格
-@param table src 来源表格
-
 ]]
+
+-- end --
+
 function table.merge(dest, src)
     for k, v in pairs(src) do
         dest[k] = v
     end
 end
+
+-- start --
+
+--------------------------------
+-- 在目标表格的指定位置插入来源表格，如果没有指定位置则连接两个表格
+-- @function [parent=#table] insertto
+-- @param table dest 目标表格
+-- @param table src 来源表格
+-- @param integer begin 插入位置,默认最后
 
 --[[--
 
@@ -844,11 +938,10 @@ table.insertto(dest, src, 5)
 
 ~~~
 
-@param table dest 目标表格
-@param table src 来源表格
-@param [integer begin] 插入位置
-
 ]]
+
+-- end --
+
 function table.insertto(dest, src, begin)
 	begin = checkint(begin)
 	if begin <= 0 then
@@ -861,6 +954,16 @@ function table.insertto(dest, src, begin)
 	end
 end
 
+-- start --
+
+--------------------------------
+-- 从表格中查找指定值，返回其索引，如果没找到返回 false
+-- @function [parent=#table] indexof
+-- @param table array 表格
+-- @param mixed value 要查找的值
+-- @param integer begin 起始索引值
+-- @return integer#integer 
+
 --[[--
 
 从表格中查找指定值，返回其索引，如果没找到返回 false
@@ -872,19 +975,25 @@ print(table.indexof(array, "b")) -- 输出 2
 
 ~~~
 
-@param table array 表格
-@param mixed value 要查找的值
-@param [integer begin] 起始索引值
-
-@return integer
-
 ]]
+
+-- end --
+
 function table.indexof(array, value, begin)
     for i = begin or 1, #array do
         if array[i] == value then return i end
     end
 	return false
 end
+
+-- start --
+
+--------------------------------
+-- 从表格中查找指定值，返回其 key，如果没找到返回 nil
+-- @function [parent=#table] keyof
+-- @param table hashtable 表格
+-- @param mixed value 要查找的值
+-- @return string#string  该值对应的 key
 
 --[[--
 
@@ -897,18 +1006,26 @@ print(table.keyof(hashtable, "chukong")) -- 输出 comp
 
 ~~~
 
-@param table hashtable 表格
-@param mixed value 要查找的值
-
-@return string 该值对应的 key
-
 ]]
+
+-- end --
+
 function table.keyof(hashtable, value)
     for k, v in pairs(hashtable) do
         if v == value then return k end
     end
     return nil
 end
+
+-- start --
+
+--------------------------------
+-- 从表格中删除指定值，返回删除的值的个数
+-- @function [parent=#table] removebyvalue
+-- @param table array 表格
+-- @param mixed value 要删除的值
+-- @param boolean removeall 是否删除所有相同的值
+-- @return integer#integer 
 
 --[[--
 
@@ -921,13 +1038,10 @@ print(table.removebyvalue(array, "c", true)) -- 输出 2
 
 ~~~
 
-@param table array 表格
-@param mixed value 要删除的值
-@param [boolean removeall] 是否删除所有相同的值
-
-@return integer
-
 ]]
+
+-- end --
+
 function table.removebyvalue(array, value, removeall)
     local c, i, max = 0, 1, #array
     while i <= max do
@@ -942,6 +1056,14 @@ function table.removebyvalue(array, value, removeall)
     end
     return c
 end
+
+-- start --
+
+--------------------------------
+-- 对表格中每一个值执行一次指定的函数，并用函数返回值更新表格内容
+-- @function [parent=#table] map
+-- @param table t 表格
+-- @param function fn 函数
 
 --[[--
 
@@ -976,15 +1098,23 @@ end
 
 ~~~
 
-@param table t 表格
-@param function fn 函数
-
 ]]
+
+-- end --
+
 function table.map(t, fn)
     for k, v in pairs(t) do
         t[k] = fn(v, k)
     end
 end
+
+-- start --
+
+--------------------------------
+-- 对表格中每一个值执行一次指定的函数，但不改变表格内容
+-- @function [parent=#table] walk
+-- @param table t 表格
+-- @param function fn 函数
 
 --[[--
 
@@ -1010,15 +1140,23 @@ end
 
 ~~~
 
-@param table t 表格
-@param function fn 函数
-
 ]]
+
+-- end --
+
 function table.walk(t, fn)
     for k,v in pairs(t) do
         fn(v, k)
     end
 end
+
+-- start --
+
+--------------------------------
+-- 对表格中每一个值执行一次指定的函数，如果该函数返回 false，则对应的值会从表格中删除
+-- @function [parent=#table] filter
+-- @param table t 表格
+-- @param function fn 函数
 
 --[[--
 
@@ -1051,15 +1189,24 @@ end
 
 ~~~
 
-@param table t 表格
-@param function fn 函数
-
 ]]
+
+-- end --
+
 function table.filter(t, fn)
     for k, v in pairs(t) do
         if not fn(v, k) then t[k] = nil end
     end
 end
+
+-- start --
+
+--------------------------------
+-- 遍历表格，确保其中的值唯一
+-- @function [parent=#table] unique
+-- @param table t 表格
+-- @param boolean bArray t是否是数组,是数组,t中重复的项被移除后,后续的项会前移
+-- @return table#table  包含所有唯一值的新表格
 
 --[[--
 
@@ -1081,22 +1228,32 @@ end
 
 ~~~
 
-@param table t 表格
-
-@return table 包含所有唯一值的新表格
-
 ]]
-function table.unique(t)
+
+-- end --
+
+function table.unique(t, bArray)
     local check = {}
     local n = {}
+    local idx = 1
     for k, v in pairs(t) do
         if not check[v] then
-            n[k] = v
+            if bArray then
+                n[idx] = v
+                idx = idx + 1
+            else
+                n[k] = v
+            end
             check[v] = true
         end
     end
     return n
 end
+
+
+--------------------------------
+-- @module string
+
 
 string._htmlspecialchars_set = {}
 string._htmlspecialchars_set["&"] = "&amp;"
@@ -1104,6 +1261,14 @@ string._htmlspecialchars_set["\""] = "&quot;"
 string._htmlspecialchars_set["'"] = "&#039;"
 string._htmlspecialchars_set["<"] = "&lt;"
 string._htmlspecialchars_set[">"] = "&gt;"
+
+-- start --
+
+--------------------------------
+-- 将特殊字符转为 HTML 转义符
+-- @function [parent=#string] htmlspecialchars
+-- @param string input 输入字符串
+-- @return string#string  转换结果
 
 --[[--
 
@@ -1116,17 +1281,24 @@ print(string.htmlspecialchars("<ABC>"))
 
 ~~~
 
-@param string input 输入字符串
-
-@return string 转换结果
-
 ]]
+
+-- end --
+
 function string.htmlspecialchars(input)
     for k, v in pairs(string._htmlspecialchars_set) do
         input = string.gsub(input, k, v)
     end
     return input
 end
+
+-- start --
+
+--------------------------------
+-- 将 HTML 转义符还原为特殊字符，功能与 string.htmlspecialchars() 正好相反
+-- @function [parent=#string] restorehtmlspecialchars
+-- @param string input 输入字符串
+-- @return string#string  转换结果
 
 --[[--
 
@@ -1139,17 +1311,24 @@ print(string.restorehtmlspecialchars("&lt;ABC&gt;"))
 
 ~~~
 
-@param string input 输入字符串
-
-@return string 转换结果
-
 ]]
+
+-- end --
+
 function string.restorehtmlspecialchars(input)
     for k, v in pairs(string._htmlspecialchars_set) do
         input = string.gsub(input, v, k)
     end
     return input
 end
+
+-- start --
+
+--------------------------------
+-- 将字符串中的 \n 换行符转换为 HTML 标记
+-- @function [parent=#string] nl2br
+-- @param string input 输入字符串
+-- @return string#string  转换结果
 
 --[[--
 
@@ -1163,14 +1342,21 @@ print(string.nl2br("Hello\nWorld"))
 
 ~~~
 
-@param string input 输入字符串
-
-@return string 转换结果
-
 ]]
+
+-- end --
+
 function string.nl2br(input)
     return string.gsub(input, "\n", "<br />")
 end
+
+-- start --
+
+--------------------------------
+-- 将字符串中的特殊字符和 \n 换行符转换为 HTML 转移符和标记
+-- @function [parent=#string] text2html
+-- @param string input 输入字符串
+-- @return string#string  转换结果
 
 --[[--
 
@@ -1178,17 +1364,16 @@ end
 
 ~~~ lua
 
-print(string.nl2br("<Hello>\nWorld"))
+print(string.text2html("<Hello>\nWorld"))
 -- 输出
 -- &lt;Hello&gt;<br />World
 
 ~~~
 
-@param string input 输入字符串
-
-@return string 转换结果
-
 ]]
+
+-- end --
+
 function string.text2html(input)
     input = string.gsub(input, "\t", "    ")
     input = string.htmlspecialchars(input)
@@ -1196,6 +1381,15 @@ function string.text2html(input)
     input = string.nl2br(input)
     return input
 end
+
+-- start --
+
+--------------------------------
+-- 用指定字符或字符串分割输入字符串，返回包含分割结果的数组
+-- @function [parent=#string] split
+-- @param string input 输入字符串
+-- @param string delimiter 分割标记字符或字符串
+-- @return array#array  包含分割结果的数组
 
 --[[--
 
@@ -1213,12 +1407,10 @@ local res = string.split(input, "-+-")
 
 ~~~
 
-@param string input 输入字符串
-@param string delimiter 分割标记字符或字符串
-
-@return array 包含分割结果的数组
-
 ]]
+
+-- end --
+
 function string.split(input, delimiter)
     input = tostring(input)
     delimiter = tostring(delimiter)
@@ -1232,6 +1424,15 @@ function string.split(input, delimiter)
     table.insert(arr, string.sub(input, pos))
     return arr
 end
+
+-- start --
+
+--------------------------------
+-- 去除输入字符串头部的空白字符，返回结果
+-- @function [parent=#string] ltrim
+-- @param string input 输入字符串
+-- @return string#string  结果
+-- @see string.rtrim, string.trim
 
 --[[--
 
@@ -1252,16 +1453,22 @@ print(string.ltrim(input))
 -   换行符 \n
 -   回到行首符 \r
 
-@param string input 输入字符串
-
-@return string 结果
-
-@see string.rtrim, string.trim
-
 ]]
+
+-- end --
+
 function string.ltrim(input)
     return string.gsub(input, "^[ \t\n\r]+", "")
 end
+
+-- start --
+
+--------------------------------
+-- 去除输入字符串尾部的空白字符，返回结果
+-- @function [parent=#string] rtrim
+-- @param string input 输入字符串
+-- @return string#string  结果
+-- @see string.ltrim, string.trim
 
 --[[--
 
@@ -1270,37 +1477,48 @@ end
 ~~~ lua
 
 local input = "ABC  "
-print(string.ltrim(input))
+print(string.rtrim(input))
 -- 输出 ABC，输入字符串最后的两个空格被去掉了
 
 ~~~
 
-@param string input 输入字符串
-
-@return string 结果
-
-@see string.ltrim, string.trim
-
 ]]
+
+-- end --
+
 function string.rtrim(input)
     return string.gsub(input, "[ \t\n\r]+$", "")
 end
+
+-- start --
+
+--------------------------------
+-- 去掉字符串首尾的空白字符，返回结果
+-- @function [parent=#string] trim
+-- @param string input 输入字符串
+-- @return string#string  结果
+-- @see string.ltrim, string.rtrim
 
 --[[--
 
 去掉字符串首尾的空白字符，返回结果
 
-@param string input 输入字符串
-
-@return string 结果
-
-@see string.ltrim, string.rtrim
-
 ]]
+
+-- end --
+
 function string.trim(input)
     input = string.gsub(input, "^[ \t\n\r]+", "")
     return string.gsub(input, "[ \t\n\r]+$", "")
 end
+
+-- start --
+
+--------------------------------
+-- 将字符串的第一个字符转为大写，返回结果
+-- @function [parent=#string] ucfirst
+-- @param string input 输入字符串
+-- @return string#string  结果
 
 --[[--
 
@@ -1314,11 +1532,10 @@ print(string.ucfirst(input))
 
 ~~~
 
-@param string input 输入字符串
-
-@return string 结果
-
 ]]
+
+-- end --
+
 function string.ucfirst(input)
     return string.upper(string.sub(input, 1, 1)) .. string.sub(input, 2)
 end
@@ -1326,6 +1543,15 @@ end
 local function urlencodechar(char)
     return "%" .. string.format("%02X", string.byte(char))
 end
+
+-- start --
+
+--------------------------------
+-- 将字符串转换为符合 URL 传递要求的格式，并返回转换结果
+-- @function [parent=#string] urlencode
+-- @param string input 输入字符串
+-- @return string#string  转换后的结果
+-- @see string.urldecode
 
 --[[--
 
@@ -1340,13 +1566,10 @@ print(string.urlencode(input))
 
 ~~~
 
-@param string input 输入字符串
-
-@return string 转换后的结果
-
-@see string.urldecode
-
 ]]
+
+-- end --
+
 function string.urlencode(input)
     -- convert line endings
     input = string.gsub(tostring(input), "\n", "\r\n")
@@ -1355,6 +1578,15 @@ function string.urlencode(input)
     -- convert spaces to "+" symbols
     return string.gsub(input, " ", "+")
 end
+
+-- start --
+
+--------------------------------
+-- 将 URL 中的特殊字符还原，并返回结果
+-- @function [parent=#string] urldecode
+-- @param string input 输入字符串
+-- @return string#string  转换后的结果
+-- @see string.urlencode
 
 --[[--
 
@@ -1369,19 +1601,24 @@ print(string.urldecode(input))
 
 ~~~
 
-@param string input 输入字符串
-
-@return string 转换后的结果
-
-@see string.urlencode
-
 ]]
+
+-- end --
+
 function string.urldecode(input)
     input = string.gsub (input, "+", " ")
     input = string.gsub (input, "%%(%x%x)", function(h) return string.char(checknumber(h,16)) end)
     input = string.gsub (input, "\r\n", "\n")
     return input
 end
+
+-- start --
+
+--------------------------------
+-- 计算 UTF8 字符串的长度，每一个中文算一个字符
+-- @function [parent=#string] utf8len
+-- @param string input 输入字符串
+-- @return integer#integer  长度
 
 --[[--
 
@@ -1395,11 +1632,10 @@ print(string.utf8len(input))
 
 ~~~
 
-@param string input 输入字符串
-
-@return integer 长度
-
 ]]
+
+-- end --
+
 function string.utf8len(input)
     local len  = string.len(input)
     local left = len
@@ -1420,6 +1656,14 @@ function string.utf8len(input)
     return cnt
 end
 
+-- start --
+
+--------------------------------
+-- 将数值格式化为包含千分位分隔符的字符串
+-- @function [parent=#string] formatnumberthousands
+-- @param number num 数值
+-- @return string#string  格式化结果
+
 --[[--
 
 将数值格式化为包含千分位分隔符的字符串
@@ -1431,11 +1675,10 @@ print(string.formatnumberthousands(1924235))
 
 ~~~
 
-@param number num 数值
-
-@return string 格式化结果
-
 ]]
+
+-- end --
+
 function string.formatnumberthousands(num)
     local formatted = tostring(checknumber(num))
     local k

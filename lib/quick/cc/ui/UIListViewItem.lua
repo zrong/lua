@@ -23,6 +23,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module UIListViewItem
+
 --[[--
 
 quick UIListViewItem控件
@@ -51,13 +54,15 @@ function UIListViewItem:ctor(item)
 	self:addContent(item)
 end
 
---[[--
+-- start --
 
-将要内容加到列表控件项中
+--------------------------------
+-- 将要内容加到列表控件项中
+-- @function [parent=#UIListViewItem] addContent
+-- @param node content 显示内容
 
-@param node content 显示内容
+-- end --
 
-]]
 function UIListViewItem:addContent(content)
 	if not content then
 		return
@@ -66,26 +71,30 @@ function UIListViewItem:addContent(content)
 	self:addChild(content, UIListViewItem.CONTENT_Z_ORDER, UIListViewItem.CONTENT_TAG)
 end
 
---[[--
+-- start --
 
-获取列表控件项中的内容
+--------------------------------
+-- 获取列表控件项中的内容
+-- @function [parent=#UIListViewItem] getContent
+-- @return node#node 
 
-@return node
+-- end --
 
-]]
 function UIListViewItem:getContent()
 	return self:getChildByTag(UIListViewItem.CONTENT_TAG)
 end
 
---[[--
+-- start --
 
-设置列表项中的大小
+--------------------------------
+-- 设置列表项中的大小
+-- @function [parent=#UIListViewItem] setItemSize
+-- @param number w 列表项宽度
+-- @param number h 列表项高度
+-- @param boolean bNoMargin 是否不使用margin margin可调用setMargin赋值
 
-@param number w 列表项宽度
-@param number h 列表项高度
-@param [boolean bNoMargin] 是否不使用margin margin可调用setMargin赋值
+-- end --
 
-]]
 function UIListViewItem:setItemSize(w, h, bNoMargin)
 	if not bNoMargin then
 		if UIScrollView.DIRECTION_VERTICAL == self.lvDirection_ then
@@ -136,10 +145,22 @@ function UIListViewItem:getMargin()
 end
 
 function UIListViewItem:setBg(bg)
-	local sp = display.newScale9Sprite(bg)
-	sp:setAnchorPoint(cc.p(0.5, 0.5))
-	sp:setPosition(cc.p(self.width/2, self.height/2))
+	local sp
+	local bgType = tolua.type(bg)
+	if "string" == bgType then
+		sp = display.newScale9Sprite(bg)
+		sp:setAnchorPoint(cc.p(0.5, 0.5))
+		sp:setPosition(cc.p(self.width/2, self.height/2))
+	elseif "ccui.Scale9Sprite" == bgType or "cc.Sprite" == bgType then
+		sp = bg
+	elseif "cc.SpriteFrame" == bgType then
+		sp = ccui.Scale9Sprite:createWithSpriteFrame(bg)
+	end
 	self:addChild(sp, UIListViewItem.BG_Z_ORDER, UIListViewItem.BG_TAG)
+end
+
+function UIListViewItem:getBg()
+	return self:getChildByTag(UIListViewItem.BG_TAG)
 end
 
 function UIListViewItem:onSizeChange(listener)
@@ -151,6 +172,41 @@ end
 -- just for listview invoke
 function UIListViewItem:setDirction(dir)
 	self.lvDirection_ = dir
+end
+
+
+function UIListViewItem:createCloneInstance_()
+    return UIListViewItem.new(self:getContent():clone())
+end
+
+function UIListViewItem:copyClonedWidgetChildren_(node)
+    -- local children = node:getChildren()
+    -- if not children or 0 == #children then
+    --     return
+    -- end
+
+    -- for i, child in ipairs(children) do
+    --     local cloneChild = node:clone()
+    --     if cloneChild then
+    --         self:addChild(cloneChild)
+    --     end
+    -- end
+end
+
+function UIListViewItem:copySpecialProperties_(node)
+	self.listener = node.listener
+	self:setMargin(node:getMargin())
+
+	local bg = node:getBg()
+	if bg then
+		if "ccui.Scale9Sprite" == tolua.type(bg) then
+			self:setBg(bg:getSprite():getSpriteFrame())
+		else
+			self:setBg(bg:getSpriteFrame())
+		end
+	end
+
+	self:setItemSize(node:getItemSize())
 end
 
 return UIListViewItem

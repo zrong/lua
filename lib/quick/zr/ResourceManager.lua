@@ -11,21 +11,33 @@ local ac = cc.AnimationCache:getInstance()
 local sfc = cc.SpriteFrameCache:getInstance()
 local tc = cc.Director:getInstance():getTextureCache()
 local FU = import('.FileUtil')
+local dragonbones = import('.dragonbones')
 
 -- T_ 前缀代表 TYPE
-RM.T_ANI    = 1    -- 动画定义文件
-RM.T_SF     = 2    -- Sprite Frame，plist
-RM.T_TEX    = 3    -- Texture，图片
-RM.T_DB     = 4    -- DragonBones，骨骼动画
+RM.T_ANI    = 1 -- 动画定义文件
+RM.T_SF     = 2 -- Sprite Frame，plist
+RM.T_TEX    = 3 -- Texture，图片
+RM.T_DB     = 4 -- DragonBones，骨骼动画
+RM.T_PAR    = 5 -- Particle，粒子动画
+RM.T_SND    = 6 -- Particle，粒子动画
 
 -- D_ 前缀代表 DIRECTORY
 RM.D_ANI    = 'ani/'
 RM.D_SF     = 'plst/'
 RM.D_TEX    = 'pdir/'
 RM.D_DB     = 'arm/'
+RM.D_PAR    = 'par/'
+RM.D_SND    = 'snd/'
 
 RM._ani = {}
 RM._db = {}
+
+local function _normalizeFilePath(dir, name)
+    if string.find(name, dir) == 1 then
+        return name
+    end
+    return string.format('%s%s', dir, name)
+end
 
 -- 将提供的可能不完整的 ani 定义名称文件名称转换成形如 ani/ani_def_*.lua 的路径
 -- 若要获得绝对路径，可使用 FU.getFullPath()
@@ -42,19 +54,15 @@ function RM.normalizeFilePath(typ, name)
             normalized = string.format('%s%s', RM.D_ANI, name)
         end
     elseif typ == RM.T_SF then
-        if string.find(name, RM.D_SF) == 1 then
-            normalized = name
-        else
-            normalized = string.format('%s%s', RM.D_SF, name)
-        end
+        normalized = _normalizeFilePath(RM.D_SF, name)
     elseif typ == RM.T_TEX then
-        if string.find(name, RM.D_TEX) == 1 then
-            normalized = name
-        else
-            normalized = string.format('%s%s', RM.D_TEX, name)
-        end
+        normalized = _normalizeFilePath(RM.D_TEX, name)
     elseif typ == RM.T_DB then
         normalized = RM._getDBFile(name)
+    elseif typ == RM.T_PAR then
+        normalized = _normalizeFilePath(RM.D_PAR, name)
+    elseif typ == RM.T_SND then
+        normalized = _normalizeFilePath(RM.D_SND, name)
     end
     return normalized
 end

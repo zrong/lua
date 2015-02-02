@@ -42,11 +42,15 @@ cc.Component  = import(".components.Component")
 local components = {
     "components.behavior.StateMachine",
     "components.behavior.EventProtocol",
+    "components.ui.BasicLayoutProtocol",
+    "components.ui.LayoutProtocol",
+    "components.ui.DraggableProtocol",
 }
 for _, packageName in ipairs(components) do
     cc.Registry.add(import("." .. packageName, CURRENT_MODULE_NAME), packageName)
 end
 
+-- cc = cc.GameObject.extend()
 local GameObject = cc.GameObject
 local ccmt = {}
 ccmt.__call = function(self, target)
@@ -60,7 +64,7 @@ setmetatable(cc, ccmt)
 -- load MVC
 cc.mvc = import(".mvc.init")
 
--- load ui library
+-- load more library
 cc.ui = import(".ui.init")
 
 -- load net library

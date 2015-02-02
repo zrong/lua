@@ -22,6 +22,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module network
+
 --[[--
 
 网络服务
@@ -30,18 +33,32 @@ THE SOFTWARE.
 
 local network = {}
 
+-- start --
+
+--------------------------------
+-- 检查地 WIFI 网络是否可用
+-- @function [parent=#network] isLocalWiFiAvailable
+-- @return boolean#boolean ret (return value: bool)  网络是否可用
+
 --[[--
 
 检查地 WIFI 网络是否可用
 
 提示： WIFI 网络可用不代表可以访问互联网。
 
-@return boolean 网络是否可用
-
 ]]
+-- end --
+
 function network.isLocalWiFiAvailable()
     return cc.Network:isLocalWiFiAvailable()
 end
+
+-- start --
+
+--------------------------------
+-- 检查互联网连接是否可用
+-- @function [parent=#network] isInternetConnectionAvailable
+-- @return boolean#boolean ret (return value: bool)  网络是否可用
 
 --[[--
 
@@ -49,12 +66,20 @@ end
 
 通常，这里接口返回 3G 网络的状态，具体情况与设备和操作系统有关。 
 
-@return boolean 网络是否可用
-
 ]]
+-- end --
+
 function network.isInternetConnectionAvailable()
     return cc.Network:isInternetConnectionAvailable()
 end
+
+-- start --
+
+--------------------------------
+-- 检查是否可以解析指定的主机名
+-- @function [parent=#network] isHostNameReachable
+-- @param string hostname 主机名
+-- @return boolean#boolean ret (return value: bool)  主机名是否可以解析
 
 --[[--
 
@@ -70,9 +95,9 @@ end
 
 注意： 该接口会阻塞程序，因此在调用该接口时应该提醒用户应用程序在一段时间内会失去响应。 
 
-@return boolean 主机名是否可以解析
-
 ]]
+-- end --
+
 function network.isHostNameReachable(hostname)
     if type(hostname) ~= "string" then
         printError("network.isHostNameReachable() - invalid hostname %s", tostring(hostname))
@@ -80,6 +105,13 @@ function network.isHostNameReachable(hostname)
     end
     return cc.Network:isHostNameReachable(hostname)
 end
+
+-- start --
+
+--------------------------------
+-- 返回互联网连接状态值
+-- @function [parent=#network] getInternetConnectionStatus
+-- @return string#string ret (return value: string)  互联网连接状态值
 
 --[[--
 
@@ -91,12 +123,22 @@ end
 -   kCCNetworkStatusReachableViaWiFi: 通过 WIFI
 -   kCCNetworkStatusReachableViaWWAN: 通过 3G 网络
 
-@return string 互联网连接状态值
-
 ]]
+-- end --
+
 function network.getInternetConnectionStatus()
     return cc.Network:getInternetConnectionStatus()
 end
+
+-- start --
+
+--------------------------------
+-- 创建异步 HTTP 请求，并返回 cc.HTTPRequest 对象。
+-- @function [parent=#network] createHTTPRequest
+-- @param function callbock 回调函数
+-- @url string http路径
+-- method string method 请求方式
+-- @return HTTPRequest#HTTPRequest ret (return value: cc.HTTPRequest) 
 
 --[[--
 
@@ -136,9 +178,9 @@ request:start()
 
 ~~~
 
-@return HTTPRequest 结果
-
 ]]
+-- end --
+
 function network.createHTTPRequest(callback, url, method)
     if not method then method = "GET" end
     if string.upper(tostring(method)) == "GET" then
@@ -148,6 +190,16 @@ function network.createHTTPRequest(callback, url, method)
     end
     return cc.HTTPRequest:createWithUrl(callback, url, method)
 end
+
+-- start --
+
+--------------------------------
+-- 通过HTTPRequest上传一个文件
+-- @function [parent=#network] uploadFile
+-- @param function callback 回调函数
+-- @param string url 上传路径
+-- @param tabel datas 上传参数
+-- @return HTTPRequest#HTTPRequest  结果
 
 --[[--
 --- Upload a file through a HTTPRequest instance.
@@ -188,6 +240,8 @@ network.uploadFile(function(evt)
 ~~~
 
 ]]		
+-- end --
+
 function network.uploadFile(callback, url, datas)
 	assert(datas or datas.fileFieldName or datas.filePath, "Need file datas!")
 	local request = network.createHTTPRequest(callback, url, "POST")
@@ -215,6 +269,16 @@ local function parseTrueFalse(t)
     return false
 end
 
+-- start --
+
+--------------------------------
+-- 转换cookie为一个字串
+-- @function [parent=#network] makeCookieString
+-- @param tabel cookie
+-- @return string#string  结果
+
+-- end --
+
 function network.makeCookieString(cookie)
     local arr = {}
     for name, value in pairs(cookie) do
@@ -229,6 +293,16 @@ function network.makeCookieString(cookie)
 
     return table.concat(arr, "; ")
 end
+
+-- start --
+
+--------------------------------
+-- 转换字串为一个cookie表
+-- @function [parent=#network] parseCookie
+-- @param string cookieString
+-- @return table#table  结果
+
+-- end --
 
 function network.parseCookie(cookieString)
     local cookie = {}

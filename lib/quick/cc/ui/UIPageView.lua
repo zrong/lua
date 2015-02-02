@@ -23,6 +23,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module UIPageView
+
 --[[--
 
 quick page控件
@@ -33,10 +36,17 @@ local UIPageViewItem = import(".UIPageViewItem")
 
 local UIPageView = class("UIPageView", function()
 	-- local node = display.newNode()
-	local node = cc.ClippingRegionNode:create()
+	local node = display.newClippingRegionNode()
 	-- node:setContentSize(display.width, display.height)
 	return node
 end)
+
+-- start --
+
+--------------------------------
+-- UIPageView构建函数
+-- @function [parent=#UIPageView] new
+-- @param table params 参数表
 
 --[[--
 
@@ -56,10 +66,9 @@ UIPageView构建函数
     -   bottom 下边间隙
 -   bCirc 页面是否循环,默认为false
 
-
-@param table params 参数表
-
 ]]
+-- end --
+
 function UIPageView:ctor(params)
 	self.items_ = {}
 	self.viewRect_ = params.viewRect or cc.rect(0, 0, display.width, display.height)
@@ -78,91 +87,178 @@ function UIPageView:ctor(params)
 	self:addNodeEventListener(cc.NODE_TOUCH_EVENT, function (event)
         	return self:onTouch_(event)
     	end)
+
+	self.args_ = {params}
 end
 
---[[--
+-- start --
 
-创建一个新的页面控件项
+--------------------------------
+-- 创建一个新的页面控件项
+-- @function [parent=#UIPageView] newItem
+-- @return UIPageViewItem#UIPageViewItem 
 
-@return UIPageViewItem
+-- end --
 
-]]
 function UIPageView:newItem()
 	local item = UIPageViewItem.new()
-	item:setContentSize(self.viewRect_.width/self.column_, self.viewRect_.height/self.row_)
+	local itemW = (self.viewRect_.width - self.padding_.left - self.padding_.right
+				- self.columnSpace_*(self.column_ - 1)) / self.column_
+	local itemH = (self.viewRect_.height - self.padding_.top - self.padding_.bottom
+				- self.rowSpace_*(self.row_ - 1)) / self.row_
+	-- item:setContentSize(self.viewRect_.width/self.column_, self.viewRect_.height/self.row_)
+	item:setContentSize(itemW, itemH)
 
 	return item
 end
 
---[[--
+-- start --
 
-添加一项到页面控件中
+--------------------------------
+-- 添加一项到页面控件中
+-- @function [parent=#UIPageView] addItem
+-- @param node item 页面控件项
+-- @return UIPageView#UIPageView 
 
-@param node item 页面控件项
+-- end --
 
-@return UIPageView
-
-]]
 function UIPageView:addItem(item)
 	table.insert(self.items_, item)
 
 	return self
 end
 
---[[--
+-- start --
 
-注册一个监听函数
+--------------------------------
+-- 移除一项
+-- @function [parent=#UIPageView] removeItem
+-- @param number idx 要移除项的序号
+-- @return UIPageView#UIPageView 
 
-@param function listener 监听函数
+-- end --
 
-@return UIPageView
+function UIPageView:removeItem(item)
+	local itemIdx
+	for i,v in ipairs(self.items_) do
+		if v == item then
+			itemIdx = i
+		end
+	end
 
-]]
+	if not itemIdx then
+		print("ERROR! item isn't exist")
+		return self
+	end
+
+	if itemIdx then
+		table.remove(self.items_, itemIdx)
+	end
+
+	self:reload(self.curPageIdx_)
+
+	return self
+end
+
+-- start --
+
+--------------------------------
+-- 移除所有页面
+-- @function [parent=#UIPageView] removeAllItems
+-- @return UIPageView#UIPageView 
+
+-- end --
+
+function UIPageView:removeAllItems()
+	self.items_ = {}
+
+	self:reload(self.curPageIdx_)
+
+	return self
+end
+
+-- start --
+
+--------------------------------
+-- 注册一个监听函数
+-- @function [parent=#UIPageView] onTouch
+-- @param function listener 监听函数
+-- @return UIPageView#UIPageView 
+
+-- end --
+
 function UIPageView:onTouch(listener)
 	self.touchListener = listener
 
 	return self
 end
 
---[[--
+-- start --
 
-加载数据，各种参数
+--------------------------------
+-- 加载数据，各种参数
+-- @function [parent=#UIPageView] reload
+-- @param number page index加载完成后,首先要显示的页面序号,为空从第一页开始显示
+-- @return UIPageView#UIPageView 
 
-@return UIPageView
+-- end --
 
-]]
-function UIPageView:reload()
+function UIPageView:reload(idx)
 	local page
+	local pageCount
 	self.pages_ = {}
 
-	self.curPageIdx_ = 1
-	if self:getPageCount() > 0 then
-		for i = 1, self:getPageCount() do
+	-- retain all items
+	for i,v in ipairs(self.items_) do
+		v:retain()
+	end
+
+	self:removeAllChildren()
+
+	pageCount = self:getPageCount()
+	if pageCount < 1 then
+		return self
+	end
+
+	if pageCount > 0 then
+		for i = 1, pageCount do
 			page = self:createPage_(i)
 			page:setVisible(false)
 			table.insert(self.pages_, page)
 			self:addChild(page)
 		end
+	end
 
-		self.pages_[1]:setVisible(true)
-		self.pages_[1]:setPosition(
-			self.viewRect_.x, self.viewRect_.y)
+	if not idx or idx < 1 then
+		idx = 1
+	elseif idx > pageCount then
+		idx = pageCount
+	end
+	self.curPageIdx_ = idx
+	self.pages_[idx]:setVisible(true)
+	self.pages_[idx]:setPosition(
+		self.viewRect_.x, self.viewRect_.y)
+
+	-- release all items
+	for i,v in ipairs(self.items_) do
+		v:release()
 	end
 
 	return self
 end
 
---[[--
+-- start --
 
-跳转到特定的页面
+--------------------------------
+-- 跳转到特定的页面
+-- @function [parent=#UIPageView] gotoPage
+-- @param integer pageIdx 要跳转的页面的位置
+-- @param boolean bSmooth 是否需要跳转动画
+-- @param bLeftToRight 移动的方向,在可循环下有效, nil:自动调整方向,false:从右向左,true:从左向右
+-- @return UIPageView#UIPageView 
 
-@param integer pageIdx 要跳转的页面的位置
-@param boolean bSmooth 是否需要跳转动画
-@param bLeftToRight 移动的方向,在可循环下有效, nil:自动调整方向,false:从右向左,true:从左向右
+-- end --
 
-@return UIPageView
-
-]]
 function UIPageView:gotoPage(pageIdx, bSmooth, bLeftToRight)
 	if pageIdx < 1 or pageIdx > self:getPageCount() then
 		return self
@@ -191,37 +287,42 @@ function UIPageView:gotoPage(pageIdx, bSmooth, bLeftToRight)
 	return self
 end
 
---[[--
+-- start --
 
-得到页面的总数
+--------------------------------
+-- 得到页面的总数
+-- @function [parent=#UIPageView] getPageCount
+-- @return number#number 
 
-@return number
+-- end --
 
-]]
 function UIPageView:getPageCount()
 	return math.ceil(table.nums(self.items_)/(self.column_*self.row_))
 end
 
---[[--
+-- start --
 
-得到当前页面的位置
+--------------------------------
+-- 得到当前页面的位置
+-- @function [parent=#UIPageView] getCurPageIdx
+-- @return number#number 
 
-@return number
+-- end --
 
-]]
 function UIPageView:getCurPageIdx()
 	return self.curPageIdx_
 end
 
---[[--
+-- start --
 
-设置页面控件是否为循环
+--------------------------------
+-- 设置页面控件是否为循环
+-- @function [parent=#UIPageView] setCirculatory
+-- @param boolean bCirc 是否循环
+-- @return UIPageView#UIPageView 
 
-@param boolean bCirc 是否循环
+-- end --
 
-@return UIPageView
-
-]]
 function UIPageView:setCirculatory(bCirc)
 	self.bCirc = bCirc
 
@@ -267,10 +368,19 @@ function UIPageView:createPage_(pageNo)
 	return page
 end
 
+function UIPageView:isTouchInViewRect_(event, rect)
+	rect = rect or self.viewRect_
+	local viewRect = self:convertToWorldSpace(cc.p(rect.x, rect.y))
+	viewRect.width = rect.width
+	viewRect.height = rect.height
+
+	return cc.rectContainsPoint(viewRect, cc.p(event.x, event.y))
+end
+
 function UIPageView:onTouch_(event)
 	if "began" == event.name
-		and not cc.rectContainsPoint(self.viewRect_, cc.p(event.x, event.y)) then
-		-- printInfo("UIPageView - touch didn't in viewRect")
+		and not self:isTouchInViewRect_(event) then
+		printInfo("UIPageView - touch didn't in viewRect")
 		return false
 	end
 
@@ -613,18 +723,15 @@ function UIPageView:onClick_(event)
 	itemH = (self.viewRect_.height - self.padding_.top - self.padding_.bottom
 				- self.rowSpace_*(self.row_ - 1)) / self.row_
 
-	local x, y = event.x, event.y
-	x = x - self.viewRect_.x
-	y = y - self.viewRect_.y
 	local itemRect = {width = itemW, height = itemH}
 
 	local clickIdx
 	for row = 1, self.row_ do
-		itemRect.y = self.viewRect_.height - self.padding_.top - row*itemH - (row - 1)*self.rowSpace_
+		itemRect.y = self.viewRect_.y + self.viewRect_.height - self.padding_.top - row*itemH - (row - 1)*self.rowSpace_
 		for column = 1, self.column_ do
-			itemRect.x = self.padding_.left + (column - 1)*(itemW + self.columnSpace_)
+			itemRect.x = self.viewRect_.x + self.padding_.left + (column - 1)*(itemW + self.columnSpace_)
 
-			if cc.rectContainsPoint(itemRect, cc.p(x,y)) then
+			if self:isTouchInViewRect_(event, itemRect) then
 				clickIdx = (row - 1)*self.column_ + column
 				break
 			end
@@ -633,6 +740,13 @@ function UIPageView:onClick_(event)
 			break
 		end
 	end
+
+	if not clickIdx then
+		-- not found, maybe touch in space
+		return
+	end
+
+	clickIdx = clickIdx + (self.column_ * self.row_) * (self.curPageIdx_ - 1)
 
 	self:notifyListener_{name = "clicked",
 		item = self.items_[clickIdx],
@@ -683,6 +797,27 @@ function UIPageView:getNextPageIndex(bRight)
 	return pos
 end
 
+function UIPageView:createCloneInstance_()
+    return UIPageView.new(unpack(self.args_))
+end
+
+function UIPageView:copyClonedWidgetChildren_(node)
+    local children = node.items_
+    if not children or 0 == #children then
+        return
+    end
+
+    for i, child in ipairs(children) do
+        local cloneChild = child:clone()
+        if cloneChild then
+            self:addItem(cloneChild)
+        end
+    end
+end
+
+function UIPageView:copySpecialProperties_(node)
+    self.bCirc = node.bCirc
+end
 
 
 return UIPageView

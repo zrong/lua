@@ -23,6 +23,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module UIGroup
+
 --[[--
 
 quick UIGroup控件
@@ -36,11 +39,14 @@ local UIGroup = class("UIGroup", function()
     return display.newNode()
 end)
 
---[[--
+-- start --
 
-UIGroup构建函数
+--------------------------------
+-- UIGroup构建函数
+-- @function [parent=#UIGroup] new
 
-]]
+-- end --
+
 function UIGroup:ctor()
     makeUIControl_(self)
     self:setLayout(UIBoxLayout.new(display.LEFT_TO_RIGHT))
@@ -48,30 +54,32 @@ function UIGroup:ctor()
     self:align(display.LEFT_BOTTOM)
 end
 
---[[--
+-- start --
 
-添加一个控件
+--------------------------------
+-- 添加一个控件
+-- @function [parent=#UIGroup] addWidget
+-- @param node widget 控件
+-- @return UIGroup#UIGroup 
 
-@param node widget 控件
+-- end --
 
-@return UIGroup
-
-]]
 function UIGroup:addWidget(widget)
     self:addChild(widget)
     self:getLayout():addWidget(widget)
     return self
 end
 
---[[--
+-- start --
 
-触摸监听函数
+--------------------------------
+-- 触摸监听函数
+-- @function [parent=#UIGroup] onTouch
+-- @param function listener 函数
+-- @return UIGroup#UIGroup 
 
-@param function listener 函数
+-- end --
 
-@return UIGroup
-
-]]
 function UIGroup:onTouch(listener)
     if not listener then listener = function() return true end end
     if USE_DEPRECATED_EVENT_ARGUMENTS then
@@ -84,30 +92,32 @@ function UIGroup:onTouch(listener)
     return self
 end
 
---[[--
+-- start --
 
-打开触摸功能
+--------------------------------
+-- 打开触摸功能
+-- @function [parent=#UIGroup] enableTouch
+-- @param boolean enabled
+-- @return UIGroup#UIGroup 
 
-@param boolean enabled
+-- end --
 
-@return UIGroup
-
-]]
 function UIGroup:enableTouch(enabled)
     self:setTouchEnabled(enabled)
     return self
 end
 
---[[--
+-- start --
 
-设置大小
+--------------------------------
+-- 设置大小
+-- @function [parent=#UIGroup] setLayoutSize
+-- @param number width
+-- @param number height
+-- @return UIGroup#UIGroup 
 
-@param number width
-@param number height
+-- end --
 
-@return UIGroup
-
-]]
 function UIGroup:setLayoutSize(width, height)
     self:getComponent("components.ui.LayoutProtocol"):setLayoutSize(width, height)
     if self.backgroundSprite_ then
@@ -116,22 +126,26 @@ function UIGroup:setLayoutSize(width, height)
     return self
 end
 
---[[--
+-- start --
 
-设置背景图片
+--------------------------------
+-- 设置背景图片
+-- @function [parent=#UIGroup] setBackgroundImage
+-- @param string filename 图片名
+-- @param table args 图片控件的参数表
+-- @return UIGroup#UIGroup 
+-- @see UIImage
 
-@param string filename 图片名
-@param table args 图片控件的参数表
+-- end --
 
-@return UIGroup
-
-@see UIImage
-
-]]
 function UIGroup:setBackgroundImage(filename, args)
     self.backgroundSprite_ = UIImage.new(filename, args):setLayoutSize(self:getLayoutSize())
     self:addChild(self.backgroundSprite_)
     return self
+end
+
+function UIGroup:clone_()
+    reAddUIComponent_(self)
 end
 
 return UIGroup

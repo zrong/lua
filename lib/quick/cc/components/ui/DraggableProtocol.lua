@@ -1,5 +1,5 @@
 
-local Component = import("..Component")
+local Component = cc.Component
 local DraggableProtocol = class("DraggableProtocol", Component)
 
 function DraggableProtocol:ctor()

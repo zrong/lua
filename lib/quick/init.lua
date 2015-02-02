@@ -22,6 +22,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module init
+
 --[[--
 
 quick framework 初始化
@@ -102,7 +105,7 @@ local CURRENT_MODULE_NAME = ...
 
 cc = cc or {}
 cc.PACKAGE_NAME = string.sub(CURRENT_MODULE_NAME, 1, -6)
-cc.VERSION = "3.2 RC"
+cc.VERSION = "3.3"
 cc.FRAMEWORK_NAME = "quick-cocos2d-x"
 
 if cc.Node.removeTouchEvent then
@@ -120,9 +123,9 @@ printInfo("#")
 device     = require(cc.PACKAGE_NAME .. ".device")
 transition = require(cc.PACKAGE_NAME .. ".transition")
 display    = require(cc.PACKAGE_NAME .. ".display")
+filter     = require(cc.PACKAGE_NAME .. ".filter")
 audio      = require(cc.PACKAGE_NAME .. ".audio")
 network    = require(cc.PACKAGE_NAME .. ".network")
-filter     = require(cc.PACKAGE_NAME .. ".filter")
 dragonbones = require(cc.PACKAGE_NAME .. ".dragonbones")
 
 require(cc.PACKAGE_NAME .. ".shortcodes")

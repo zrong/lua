@@ -23,6 +23,10 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module ui
+-- @parent_module cc
+
 --[[--
 
 初始化 cc.ui 扩展
@@ -36,11 +40,28 @@ local ui = {}
 
 function makeUIControl_(control)
     cc(control)
-    control:addComponent(cc.PACKAGE_NAME .. ".cc.components.ui.LayoutProtocol"):exportMethods()
-    control:addComponent(cc.PACKAGE_NAME .. ".cc.components.behavior.EventProtocol"):exportMethods()
+    control:addComponent("components.ui.LayoutProtocol"):exportMethods()
+    control:addComponent("components.behavior.EventProtocol"):exportMethods()
 
     control:setCascadeOpacityEnabled(true)
     control:setCascadeColorEnabled(true)
+    control:addNodeEventListener(c.NODE_EVENT, function(event)
+        if event.name == "cleanup" then
+            control:removeAllEventListeners()
+        end
+    end)
+end
+
+function reAddUIComponent_(control)
+    -- control:removeComponent("components.ui.LayoutProtocol")
+    -- control:removeComponent("components.behavior.EventProtocol")
+    print("lua remove all node listener")
+    -- control:removeAllNodeEventListeners()
+
+    control:addComponent("components.ui.LayoutProtocol"):exportMethods()
+    control:addComponent("components.behavior.EventProtocol"):exportMethods()
+
+    print("lua add node listener")
     control:addNodeEventListener(c.NODE_EVENT, function(event)
         if event.name == "cleanup" then
             control:removeAllEventListeners()

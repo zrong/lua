@@ -1,6 +1,6 @@
 
 if cc.bPlugin_ then
-	luaj = require("luaj")
+	luaj = require("cocos.cocos2d.luaj")
 else
 	luaj = require(cc.PACKAGE_NAME .. ".luaj")
 end

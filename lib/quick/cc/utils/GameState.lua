@@ -6,7 +6,7 @@ GameState.ERROR_HASH_MISS_MATCH       = -2
 GameState.ERROR_STATE_FILE_NOT_FOUND  = -3
 
 local crypto = require(cc.PACKAGE_NAME .. ".crypto")
-local json   = require(cc.PACKAGE_NAME .. ".json")
+local json = require(cc.PACKAGE_NAME .. ".json")
 
 local encodeSign    = "=QP="
 local stateFilename = "state.txt"
