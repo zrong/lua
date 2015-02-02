@@ -22,6 +22,9 @@ THE SOFTWARE.
 
 ]]
 
+--------------------------------
+-- @module cocos2dx
+
 --[[--
 
 针对 cocos2d-x 的一些封装和扩展
@@ -48,6 +51,7 @@ THE SOFTWARE.
 local p = cc.PACKAGE_NAME .. ".cocos2dx."
 
 require(p .. "Event")
+require(p .. "ActionEx")
 require(p .. "NodeEx")
 require(p .. "SceneEx")
 require(p .. "SpriteEx")
