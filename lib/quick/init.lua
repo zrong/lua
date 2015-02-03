@@ -126,7 +126,6 @@ display    = require(cc.PACKAGE_NAME .. ".display")
 filter     = require(cc.PACKAGE_NAME .. ".filter")
 audio      = require(cc.PACKAGE_NAME .. ".audio")
 network    = require(cc.PACKAGE_NAME .. ".network")
-dragonbones = require(cc.PACKAGE_NAME .. ".dragonbones")
 
 require(cc.PACKAGE_NAME .. ".shortcodes")
 
