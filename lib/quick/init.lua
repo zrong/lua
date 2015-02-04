@@ -126,10 +126,11 @@ display    = require(cc.PACKAGE_NAME .. ".display")
 filter     = require(cc.PACKAGE_NAME .. ".filter")
 audio      = require(cc.PACKAGE_NAME .. ".audio")
 network    = require(cc.PACKAGE_NAME .. ".network")
+crypto     = require(cc.PACKAGE_NAME .. ".crypto")
+json       = require(cc.PACKAGE_NAME .. ".json")
 
 require(cc.PACKAGE_NAME .. ".shortcodes")
 
---[[
 if device.platform == "android" then
     require(cc.PACKAGE_NAME .. ".platform.android")
 elseif device.platform == "ios" then
@@ -137,7 +138,6 @@ elseif device.platform == "ios" then
 elseif device.platform == "mac" then
     require(cc.PACKAGE_NAME .. ".platform.mac")
 end
-]]
 
 require(cc.PACKAGE_NAME .. ".cc.init")
 
