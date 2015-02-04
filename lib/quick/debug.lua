@@ -133,13 +133,13 @@ dump(t)
 
 @param mixed value 要输出的值
 
+@param [string desciption] 输出内容前的文字描述
+
 @parma [integer nesting] 输出时的嵌套层级，默认为 3
 
-@param [string behavior] 值为 'string' 则返回 string，为 'table' 则返回包含 dump 内容的 table，为 'print' 则打印 string
 ]]
-function dump(value, nesting, behavior)
+function dump(value, desciption, nesting)
     if type(nesting) ~= "number" then nesting = 3 end
-    if not behavior then behavior = 'print' end
 
     local lookupTable = {}
     local result = {}
@@ -151,14 +151,12 @@ function dump(value, nesting, behavior)
         return tostring(v)
     end
 
-    if behavior == 'print' then
-        local traceback = string.split(debug.traceback("", 2), "\n")
-        print("dump from: " .. string.trim(traceback[3]))
-    end
+    local traceback = string.split(debug.traceback("", 2), "\n")
+    print("dump from: " .. string.trim(traceback[3]))
 
     local function _dump(value, desciption, indent, nest, keylen)
         desciption = desciption or "<var>"
-        spc = ""
+        local spc = ""
         if type(keylen) == "number" then
             spc = string.rep(" ", keylen - string.len(_v(desciption)))
         end
@@ -197,15 +195,9 @@ function dump(value, nesting, behavior)
             end
         end
     end
-    _dump(value, "", "- ", 1)
+    _dump(value, desciption, "- ", 1)
 
-    if behavior == 'table' then 
-        return result 
-    elseif behavior == 'string' then
-        return table.concat(result, '\n')
-    elseif behavior == 'print' then
-        for i, line in ipairs(result) do
-            print(line)
-        end
+    for i, line in ipairs(result) do
+        print(line)
     end
 end
