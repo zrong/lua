@@ -26,27 +26,27 @@ local dbManager = db.DBCCFactory:getInstance()
 -- Creation：2014-10-28
 -- @param params
 -- {
---		skeleton="dragon/skeleton.xml",
---		texture="dragon/texture.xml",
---		armatureName="Dragon",
---		animationName="walk",
---		skeletonName="Dragon",
---		skinName=""
---	}
---	下面的参数将在 dragon 文件夹中搜索 skeleton.xml 和 texture.xml
+--      skeleton="dragon/skeleton.xml",
+--      texture="dragon/texture.xml",
+--      armatureName="Dragon",
+--      animationName="walk",
+--      skeletonName="Dragon",
+--      skinName=""
+--  }
+--  下面的参数将在 dragon 文件夹中搜索 skeleton.xml 和 texture.xml
 -- {
---		path="dragon",
---		armatureName="Dragon",
---		animationName="",
---		skeletonName="Dragon",
---	}
---	下面的参数直接在缓存中查找必要的骨骼动画数据（数据必须已经载入）
+--      path="dragon",
+--      armatureName="Dragon",
+--      animationName="",
+--      skeletonName="Dragon",
+--  }
+--  下面的参数直接在缓存中查找必要的骨骼动画数据（数据必须已经载入）
 -- {
---		armatureName="Dragon",
---		animationName="walk",
---		skeletonName="Dragon",
---		skinName = ""
---	}
+--      armatureName="Dragon",
+--      animationName="walk",
+--      skeletonName="Dragon",
+--      skinName = ""
+--  }
 function dragonbones.new(params)
     args = dragonbones._initParam(params)
     dragonbones.loadData(args)
@@ -68,7 +68,7 @@ function dragonbones._initParam(params)
     if not params.skinName then
         params.skinName = ''
     end
-	assert(params.armatureName and params.skeletonName, 
+    assert(params.armatureName and params.skeletonName, 
         "armatureName and skeletonName are necessary!")
     return params
 end
@@ -78,12 +78,12 @@ function dragonbones.loadData(params, initParam)
     if initParam then
         args = dragonbones._initParam(params)
     end
-	if args.path then
+    if args.path then
         dbManager:loadDataByDir(args.path, args.skeletonName, args.textureName)
     elseif args.skeleton and args.texture then
         dbManager:loadData(args.skeleton, args.texture, 
             args.skeletonName, args.textureName)
-	end
+    end
 end
 
 function dragonbones.unloadData(params, initParam)
