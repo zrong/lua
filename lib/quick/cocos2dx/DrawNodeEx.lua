@@ -50,6 +50,17 @@ function DrawNode:drawDot(point, radius, color)
     return self
 end
 
+
+local drawCircle = DrawNode.drawCircle
+function DrawNode:drawCircle(radius, params)
+    local fillColor = nil
+    if params then
+        if params.fillColor then fillColor = params.fillColor end
+    end
+    drawCircle(self, cc.p(0,0), radius, 360, 30, true, fillColor)
+    return self
+end
+
 local drawRect = DrawNode.drawRect
 function DrawNode:drawRect(rect, params)
     local fillColor = nil
