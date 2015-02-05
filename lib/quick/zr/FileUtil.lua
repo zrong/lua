@@ -14,6 +14,10 @@ function FU.isDir(filename)
     return string.byte(filename, -1) == 47
 end
 
+function FU.isAbsolutePath(filename)
+	return fu:isAbsolutePath(filename)
+end
+
 function FU.getWritablePath(filename)
     if filename then
         return FU.WRITEABLE_PATH .. filename

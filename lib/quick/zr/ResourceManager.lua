@@ -61,6 +61,7 @@ end
 -- 将提供的可能不完整的 ani 定义名称文件名称转换成形如 ani/ani_def_*.lua 的路径
 -- 若要获得绝对路径，可使用 FU.getFullPath()
 function RM.normalizeFilePath(typ, name)
+	if FU.isAbsolutePath(name) then return name end
     local normalized = nil
     if typ == RM.T_ANI then
         normalized = _getAniDefFile(name)

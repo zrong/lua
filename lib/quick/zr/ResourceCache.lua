@@ -114,6 +114,14 @@ function RC.newScale9Sprite(sceneName, filename, x, y, size, capInsets)
     return display.newScale9Sprite(fname, x, y, size, capInsets)
 end
 
+function RC.newFilteredSprite(sceneName, filename, filters, params)
+    assert(string.byte(filename) ~= 35, 
+        'RC.newSprite, SpriteFrame is not supported!')
+    local fname = RM.normalizeFilePath(RM.T_TEX, filename)
+    RC.recordPdir(sceneName, fname)
+    return display.newFilteredSprite(fname, x, y, filters, params)
+end
+
 -- 重新封装 display.newBatchNode ，提供将图片按场景缓存的功能。
 function RC.newBatchNode(sceneName, filename, capacity)
     local fname = RM.normalizeFilePath(RM.T_SF, filename)
