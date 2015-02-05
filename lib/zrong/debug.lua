@@ -120,7 +120,7 @@ function dump(value, nesting, behavior)
         if type(keylen) == "number" then
             spc = string.rep(" ", keylen - string.len(_v(desciption)))
         end
-        ]]
+        --]]
         if type(value) ~= "table" then
             if type(desciption) == 'string' then
                 if nest <= nesting then
@@ -130,7 +130,7 @@ function dump(value, nesting, behavior)
                 end
             else
                 if nest <= nesting then
-                    result[#result +1] = string.format("%s%s%s", indent, _v(object), spc)
+                    result[#result +1] = string.format("%s%s%s", indent, _v(value), spc)
                 end
             end
         elseif not lookupTable[value] then

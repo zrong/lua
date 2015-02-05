@@ -20,6 +20,7 @@ RM.T_TEX    = 3 -- Texture，图片
 RM.T_DB     = 4 -- DragonBones，骨骼动画
 RM.T_PAR    = 5 -- Particle，粒子动画
 RM.T_SND    = 6 -- Particle，粒子动画
+RM.T_ANI_SF = 7 -- 动画用的 Sprite Frame 文件
 
 -- D_ 前缀代表 DIRECTORY
 RM.D_ANI    = 'ani/'
@@ -39,20 +40,32 @@ local function _normalizeFilePath(dir, name)
     return string.format('%s%s', dir, name)
 end
 
+local function _getAniDefFile(name)
+    if string.find(name, RM.D_ANI) == 1 then
+        return name
+    elseif not string.find(name, 'ani_def_') then
+        return string.format('%sani_def_%s.lua', RM.D_ANI, name)
+    elseif string.find(name, '.lua') ~= #name - 3 then
+        return string.format('%s%s.lua', RM.D_ANI, name)
+    end
+    return string.format('%s%s', RM.D_ANI, name)
+end
+
+local function _normalizeFilePath(dir, name)
+    if string.find(name, dir) == 1 then
+        return name
+    end
+    return string.format('%s%s', dir, name)
+end
+
 -- 将提供的可能不完整的 ani 定义名称文件名称转换成形如 ani/ani_def_*.lua 的路径
 -- 若要获得绝对路径，可使用 FU.getFullPath()
 function RM.normalizeFilePath(typ, name)
     local normalized = nil
-    if typ == RM.D_ANI then
-        if string.find(name, RM.D_ANI) == 1 then
-            normalized =name
-        elseif not string.find(name, 'ani_def_') then
-            normalized = string.format('%sani_def_%s.lua', RM.D_ANI, name)
-        elseif string.find(name, '.lua') ~= #name - 3 then
-            normalized = string.format('%s%s.lua', RM.D_ANI, name)
-        else
-            normalized = string.format('%s%s', RM.D_ANI, name)
-        end
+    if typ == RM.T_ANI then
+        normalized = _getAniDefFile(name)
+    elseif typ == RM.T_ANI_SF then
+        normalized = _normalizeFilePath(RM.D_ANI, name)
     elseif typ == RM.T_SF then
         normalized = _normalizeFilePath(RM.D_SF, name)
     elseif typ == RM.T_TEX then
@@ -70,18 +83,20 @@ end
 -- 从一个动画定义文件中载入动画配置。
 -- aniDefName 动画定义文件的名称，不必包含路径和扩展名，
 -- 甚至不需要包含 ani_def_ 前缀。
--- handler接受三个参数：
+-- asyncHandler 接受三个参数：
 -- 1. 提供的aniDefName 
 -- 2. 定义文件完整路径
 -- 3. 定义文件的 lua  table.
-function RM.addAniDef(aniDefName, handler)
+function RM.addAniDef(aniDefName, asyncHandler)
     local defFile = FU.getFullPath(RM.normalizeFilePath(RM.T_ANI, aniDefName))
     local def = RM._ani[defFile]
-    if def then 
+    if def then
         log:warning('ResourceManager.addAniDef %s(%s) 已经在缓存中了。', aniDefName, defFile)
-        handler(aniDefName, defFile, def)
+        asyncHandler(aniDefName, defFile, def)
         return true 
     end
+    log:info("ResourceManager.addAniDef aniDefName:%s, defFile:%s, def:%s", 
+        aniDefName, defFile, def or 'nil')
     def = RM._fillAniSFPath(defFile)
     RM._ani[defFile] = def
     local texNum = #def.spritesheets
@@ -89,11 +104,21 @@ function RM.addAniDef(aniDefName, handler)
     -- 根据动画定义文件创建一个 Animation 实例并保存在 AnimationCache 中
     local fillAnimationCache = function()
         for __, ani in pairs(def.animations) do
-            local frameStart = ani.range[1] 
-            local frameNum = ani.range[2]-ani.range[1]+1
-            local spriteFrames = display.newFrames(ani.frame_name, 
-                frameStart, frameNum)
-            animation = cc.Animation:createWithSpriteFrames(spriteFrames, 
+            -- 有些旧的 ani_def 文件直接提供了所有帧的名称
+            local spriteFrames = nil
+            if ani.frames then
+                spriteFrames = {}
+                for i, frame_name in ipairs(ani.frames) do
+                    spriteFrames[i] = sfc:getSpriteFrame(frame_name)
+                end
+            -- 有些则是使用 range
+            else
+                local frameStart = ani.range[1]
+                local frameNum = ani.range[2]-ani.range[1]+1
+                spriteFrames = display.newFrames(ani.frame_name, 
+                    frameStart, frameNum)
+            end
+            local animation = cc.Animation:createWithSpriteFrames(spriteFrames, 
                 ani.delay_per_unit, ani.loops)
             ac:addAnimation(animation, ani.name)
         end
@@ -102,11 +127,13 @@ function RM.addAniDef(aniDefName, handler)
         curTex = curTex + 1
         if curTex >= texNum then
             fillAnimationCache()
-            handler(aniDefName, defFile, def)
+            asyncHandler(aniDefName, defFile, def)
         end
     end
+    -- 调用 addSF 载入动画定义文件中的 plist 和 png 到缓存中
     for __, ss in pairs(def.spritesheets) do
-        RM.addSF(ss, localHandler)
+        -- ani 中的 plist 路径已经经过 normalize ，不应该再处理
+        RM.addSF(ss, localHandler, true)
     end
     return false
 end
@@ -115,7 +142,7 @@ end
 function RM._fillAniSFPath(defFile)
     local def = dofile(defFile)
     for key, path in pairs(def.spritesheets) do
-        def.spritesheets[key] = RM.normalizeFilePath(RM.T_ANI, path)
+        def.spritesheets[key] = RM.normalizeFilePath(RM.T_ANI_SF, path)
     end
     return def
 end
@@ -156,7 +183,8 @@ function RM.addAniDefList(list, asyncHandler)
         return
     end
     local localHandler = function(aniDefName, aniDefFile, def)
-        log:info("ResourceManager.addAniDefList.localHandler: %s", aniDefName)
+        log:info("ResourceManager.addAniDefList.localHandler aniDefName:%s, aniDefFile:%s, def:%s", 
+        aniDefName, aniDefFile, def)
         amount = amount - 1
         asyncHandler(amount)
     end
@@ -214,9 +242,12 @@ function RM.removeTexList(list)
     end
 end
 
-function RM.addSF(name, handler)
-    name = RM.normalizeFilePath(RM.T_SF, name)
-    display.addSpriteFrames(name..'.plist', name..'.png', handler)
+function RM.addSF(name, asyncHandler, noNormalize)
+    log:info('ResourceManager.addSF name:%s noNormalize:%s', name, noNormalize or 'nil')
+    if not noNormalize then
+        name = RM.normalizeFilePath(RM.T_SF, name)
+    end
+    display.addSpriteFrames(name..'.plist', name..'.png', asyncHandler)
     --sfc:addSpriteFrames(name..'.plist', cc.Texture2D:new())
 end
 
@@ -436,7 +467,7 @@ function RM.getCachedTextureInfo(fmt)
 end
 
 function RM.printCachedTextureInfo(fmt)
-    d(RM.getCachedTextureInfo(fmt))
+    log:info(RM.getCachedTextureInfo(fmt))
 end
 
 return RM

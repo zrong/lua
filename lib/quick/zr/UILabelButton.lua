@@ -87,7 +87,7 @@ function UILabelButton:ctor(__options)
                 text = __options.number,
                 font = FontUtil.BODY,
                 size = FontUtil.SS,
-                color = ccc3(253, 152, 14)})
+                color = cc.c3b(253, 152, 14)})
                 :addTo(self)
                 :align(display.LEFT_CENTER, self._label:getX() + self._label:getW() / 2 + __options.spacing, self.height / 2 + gar(7))
         end

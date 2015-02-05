@@ -154,14 +154,11 @@ end
 
 -- 与 ResourceManager.addAniDefList 功能相同，但基于 Scene Name 进行缓存
 function RC.addAniDefList(sceneName, list, asyncHandler)
-   local list = _record(RM.T_ANI,  list, sceneName) 
-   if #list == 0 then
-       if asyncHandler then
-           asyncHandler(0)
-       end
-   else
-       RM.addAniDefList(list, asyncHandler)
+   if #list == 0 and asyncHandler then
+       asyncHandler(0)
+       return
    end
+   RM.addAniDefList(list, asyncHandler)
 end
 
 function RC.removeAniDefList(sceneName, list, force)
