@@ -179,12 +179,12 @@ function UIProgressBar:addFg(__fgFile, __width, __height, __offsetX)
         self._fg:setFlipX(true)
     end
 
-    local __progress = CCProgressTimer:create(__fg)
-    __progress:setType(kCCProgressTimerTypeBar)
+    local __progress = cc.ProgressTimer:create(__fg)
+    __progress:setType(cc.PROGRESS_TIMER_TYPE_BAR)
 
     __progress:setBarChangeRate(cc.p(1,0))
 
-    --self._progress:setReverseProgress(true)
+    --self._progress:setReverseDirection(true)
     
     local __top = (__height - __progress:getContentSize().height - self._paddingY) / 2
     --print("fgprogress.width:", self._fg:getContentSize().width, self._progress:getContentSize().height, __top)

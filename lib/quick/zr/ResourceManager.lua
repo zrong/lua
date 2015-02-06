@@ -30,8 +30,8 @@ RM.D_DB     = 'arm/'
 RM.D_PAR    = 'par/'
 RM.D_SND    = 'snd/'
 
-RM._ani = {}
-RM._db = {}
+local _ani = {}
+local _db = {}
 
 local function _normalizeFilePath(dir, name)
     if string.find(name, dir) == 1 then
@@ -58,10 +58,20 @@ local function _normalizeFilePath(dir, name)
     return string.format('%s%s', dir, name)
 end
 
+-- 判断 name 中是否有路径分隔符，将真正的 name 提取出来
+local function _splitname(name)
+    local pathd = string.rfind(name, '/', 0, true)
+    local path = name
+    if pathd then
+        name = string.sub(path, pathd+1)
+    end
+    return name, path
+end
+
 -- 将提供的可能不完整的 ani 定义名称文件名称转换成形如 ani/ani_def_*.lua 的路径
 -- 若要获得绝对路径，可使用 FU.getFullPath()
 function RM.normalizeFilePath(typ, name)
-	if FU.isAbsolutePath(name) then return name end
+    if FU.isAbsolutePath(name) then return name end
     local normalized = nil
     if typ == RM.T_ANI then
         normalized = _getAniDefFile(name)
@@ -90,7 +100,7 @@ end
 -- 3. 定义文件的 lua  table.
 function RM.addAniDef(aniDefName, asyncHandler)
     local defFile = FU.getFullPath(RM.normalizeFilePath(RM.T_ANI, aniDefName))
-    local def = RM._ani[defFile]
+    local def = _ani[defFile]
     if def then
         log:warning('ResourceManager.addAniDef %s(%s) 已经在缓存中了。', aniDefName, defFile)
         asyncHandler(aniDefName, defFile, def)
@@ -99,7 +109,7 @@ function RM.addAniDef(aniDefName, asyncHandler)
     log:info("ResourceManager.addAniDef aniDefName:%s, defFile:%s, def:%s", 
         aniDefName, defFile, def or 'nil')
     def = RM._fillAniSFPath(defFile)
-    RM._ani[defFile] = def
+    _ani[defFile] = def
     local texNum = #def.spritesheets
     local curTex = 0
     -- 根据动画定义文件创建一个 Animation 实例并保存在 AnimationCache 中
@@ -158,7 +168,7 @@ end
 -- 和 TextureCache 中移除对应的帧缓存和纹理缓存。
 function RM.removeAniDef(aniDefName, removeOthersCache)
     local defFile = FU.getFullPath(RM.normalizeFilePath(RM.T_ANI, aniDefName))
-    local def = RM._ani[defFile]
+    local def = _ani[defFile]
     if not def then 
         log:warning('ResourceManager.removeAniDef %s(%s) 不在缓存中，不能移除。', aniDefName, defFile)
         return false 
@@ -168,7 +178,7 @@ function RM.removeAniDef(aniDefName, removeOthersCache)
         ac:removeAnimation(ani.name)
     end
 
-    RM._ani[defFile] = nil
+    _ani[defFile] = nil
     if removeOthersCache or removeOthersCache == nil then
         for __, ss in pairs(def.spritesheets) do
             RM.removeSF(ss)
@@ -201,11 +211,11 @@ function RM.removeAniDefList(list, removeOthersCache)
     end
 end
 
-function RM.addTex(name, handler)
+function RM.addTex(name, asyncHandler)
     name = RM.normalizeFilePath(RM.T_TEX, name)
-    if handler then
+    if asyncHandler then
         tc:addImageAsync(name, function()
-            handler(name)
+            asyncHandler(name)
         end)
         return false
     end
@@ -301,46 +311,47 @@ function RM._getDBFile(armName)
     return fullPath
 end
 
-function RM.addDB(name, handler)
-    local armFile = RM._getDBFile(name)
-    local arm = RM._db[armFile]
-    if arm then 
-        log:warning('ResourceManager.addDB %s(%s) 已经在缓存中了。', name, armFile)
-        handler(name, armFile, arm)
+function RM.addDB(name, asyncHandler)
+    local name, path = _splitname(name)
+    local armFile = RM._getDBFile(path)
+    local arm = _db[armFile]
+    if arm then
+        log:warning('ResourceManager.addDB %s(%s) 已经在缓存中了。', path, armFile)
+        asyncHandler(path, armFile, arm)
         return true 
     end
     arm = {
+        -- 保存原始传递进来的 name 值，用于removeDBList
+        name=path,
         path=armFile,
         armatureName=name,
         textureName=name,
         skeletonName=name,
     }
     dragonbones.loadData(arm)
-    RM._db[armFile] = arm
-    dump(RM._db)
-    handler(name, armFile, arm)
+    _db[armFile] = arm
+    dump(_db)
+    asyncHandler(path, armFile, arm)
+    -- 判断
     return true
 end
 
 function RM.removeDB(name)
     local armFile = RM._getDBFile(name)
-    local arm = RM._db[armFile]
+    local arm = _db[armFile]
     if not arm then
-        log:warning('ResourceManger.removeDB %s(%s) 不在缓存中，不能移除。', name, armFile)
+        log:warning('ResourceManger.removeDB %s(%s) 不在缓存中，不能移除。', path, armFile)
         return false
     end
-    dragonbones.unloadData({
-        path=armFile,
-        armatureName=name,
-        textureName=name,
-        skeletonName=name,
-    })
+    dragonbones.unloadData(arm)
+    _db[armFile] = nil
     return true
 end
 
+-- 创建一个 DBCCArmatureNode 对象
 function RM.getDB(name)
     local armFile = RM._getDBFile(name)
-    local arm = RM._db[armFile]
+    local arm = _db[armFile]
     assert(arm, string.format('ResourceManager.getDB %s(%s) 还没有载入！请首先执行 addDB！', 
         name, armFile))
     return dragonbones.new({
@@ -350,6 +361,12 @@ function RM.getDB(name)
         animationName = arm.animationName,
         skinName = arm.skinName,
     })
+end
+
+-- 返回一个用于创建 DragonBones 的数据对象
+function RM.getDBObj(name)
+    local armFile = RM._getDBFile(name)
+    return _db[armFile]
 end
 
 function RM.addDBList(list, asyncHandler)
@@ -368,8 +385,14 @@ function RM.addDBList(list, asyncHandler)
 end
 
 function RM.removeDBList(list)
-    for __, arm in pairs(list) do
-        RM.removeDB(arm)
+    if not list then
+        list = {}
+        for k,v in pairs(db) do
+            list[#list+1] = v.name
+        end
+    end
+    for __, name in pairs(list) do
+        RM.removeDB(name)
     end
 end
 
