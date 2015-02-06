@@ -50,7 +50,6 @@ function DrawNode:drawDot(point, radius, color)
     return self
 end
 
-
 local drawCircle = DrawNode.drawCircle
 function DrawNode:drawCircle(radius, params)
     local fillColor = nil
@@ -61,19 +60,24 @@ function DrawNode:drawCircle(radius, params)
     return self
 end
 
+-- 绘制一个矩形边框
+-- @param orig 左下角坐标 cc.p
+-- @param dest 右上角坐标 cc.p
+-- @param color cc.c4f
 local drawRect = DrawNode.drawRect
-function DrawNode:drawRect(rect, params)
-    local fillColor = nil
-    if params then
-        if params.fillColor then fillColor = params.fillColor end
-    end
-    local x,y,w,h = rect.x, rect.y, rect.w, rect.h
-    local lb = cc.p(x,y)
-    local lt = cc.p(x,y+h)
-    local rt = cc.p(x+w,y+h)
-    local rb = cc.p(x+w,y)
-    drawRect(self, lb, lt, rt, rb, fillColor)
+function DrawNode:drawRect(orig, dest, color)
+    drawRect(self, orig, dest, color)
     return self
+end
+
+-- 绘制一个填充的矩形
+-- @param orig 左下角坐标 cc.p
+-- @param dest 右上角坐标 cc.p
+-- @param color cc.c4f
+local drawSolidRect = DrawNode.drawSolidRect
+function DrawNode:drawSolidRect(orig, dest, color)
+	drawSolidRect(self, orig, dest, color)
+	return self
 end
 
 local clear = DrawNode.clear

@@ -177,7 +177,7 @@ function UILabelButton:_onTouch(evt)
     }
 
     if ename == "began" then
-        UILabelButton._startPos = ccp(ox, oy)
+        UILabelButton._startPos = cc.p(ox, oy)
         -- print('------------------- began 中调用 PRESSED_EVENT')
         self._fsm:doEvent("press")
         self:dispatchEvent({name = UILabelButton.PRESSED_EVENT, x = ox, y = oy})
@@ -244,7 +244,7 @@ function UILabelButton:_onStateChange(__event)
 end
 
 function UILabelButton:_checkTouchArea(__x, __y)
-    local __inBox = self:getCascadeBoundingBox():containsPoint(ccp(__x, __y))
+    local __inBox = self:getCascadeBoundingBox():containsPoint(cc.p(__x, __y))
     local __inMoveRange =  math.abs(__x - UILabelButton._startPos.x) < UILabelButton._MOVE_RANGE and math.abs(__y - UILabelButton._startPos.y) < UILabelButton._MOVE_RANGE
     return __inBox and __inMoveRange
 end
