@@ -4,6 +4,10 @@
 
 local LogHandler = class('LogHandler')
 
+local function _isfmt(fmt)
+    return type(fmt) == 'string' and string.find(fmt, "%%")
+end
+
 -- @starttime 
 -- @gettime A function, return current time.
 function LogHandler:ctor(starttime, gettime)
@@ -26,13 +30,20 @@ function LogHandler:getString(level, fmt, args)
     if self._starttime then
         strlist[#strlist+1] = string.format('[%.4f]', self._gettime()-self._starttime)
     end
-    if #args > 0 and 
-        type(fmt) == 'string' and
-        string.find(fmt, "%%") then
-        strlist[#strlist+1] = string.format(fmt, unpack(args))
-    else
+    local argsnum = #args
+    if argsnum > 0 and _isfmt(fmt) then
+        local fmtnum = select(2, string.gsub(fmt, '%%%a', ''))
+        if fmtnum ~= argsnum then
+            strlist[#strlist+1] = 'LogHandler ERROR -- Cannot get a nil value between arguments OR you give a bad amout of arguments.'
+        else
+            strlist[#strlist+1] = string.format(fmt, unpack(args))
+        end
+    elseif _isfmt(fmt) then
+        fmt = string.gsub(fmt, '%%%a', 'nil')
         strlist[#strlist+1] = fmt
-        for i=1, #args do
+    else
+        strlist[#strlist+1] = tostring(fmt)
+        for i=1, argsnum do
             strlist[#strlist+1] = tostring(args[i])
         end
     end
