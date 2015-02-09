@@ -51,12 +51,14 @@ function DrawNode:drawDot(point, radius, color)
 end
 
 local drawCircle = DrawNode.drawCircle
-function DrawNode:drawCircle(radius, params)
-    local fillColor = nil
-    if params then
-        if params.fillColor then fillColor = params.fillColor end
-    end
-    drawCircle(self, cc.p(0,0), radius, 360, 30, true, fillColor)
+function DrawNode:drawCircle(center, radius, angle, segments, drawLineToCenter, color)
+    drawCircle(self, center, radius, angle, segments, drawLineToCenter, color)
+    return self
+end
+
+local drawSolidCircle = DrawNode.drawSolidCircle
+function DrawNode:drawSolidCircle(center, radius, angle, segments, color)
+    drawSolidCircle(self, center, radius, angle, segments, color)
     return self
 end
 
@@ -70,13 +72,35 @@ function DrawNode:drawRect(orig, dest, color)
     return self
 end
 
--- 绘制一个填充的矩形
+-- 绘制一个矩形填充
 -- @param orig 左下角坐标 cc.p
 -- @param dest 右上角坐标 cc.p
 -- @param color cc.c4f
 local drawSolidRect = DrawNode.drawSolidRect
 function DrawNode:drawSolidRect(orig, dest, color)
 	drawSolidRect(self, orig, dest, color)
+	self:setContentSize(cc.size(dest.x-orig.x, dest.y-orig.y))
+	return self
+end
+
+-- 绘制一根线
+-- @param orig 起始点坐标 cc.p
+-- @param dest 结束点坐标 cc.p
+-- @param color cc.c4f
+local drawLine = DrawNode.drawLine
+function DrawNode:drawLine(orig, dest, color)
+	drawLine(self, orig, dest, color)
+	return self
+end
+
+-- 绘制一根可以设置粗细的线
+-- @param from 起始点坐标 cc.p
+-- @param to 结束点坐标 cc.p
+-- @param radius number
+-- @param color cc.c4f
+local drawSegment = DrawNode.drawSegment
+function DrawNode:drawSegment(from, to, radius, color)
+	drawSegment(self, from, to, radius, color)
 	return self
 end
 

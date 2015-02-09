@@ -30,7 +30,7 @@ local function _record(typ,  list, sceneName)
         -- 将路径标准化，方便比对唯一值
         item = RM.normalizeFilePath(typ, item)
         if cache[item] then
-           caches[item][sceneName] = true
+           cache[item][sceneName] = true
         else
             waitLoaded[#waitLoaded+1] = item
 

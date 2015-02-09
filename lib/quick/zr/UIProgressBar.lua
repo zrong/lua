@@ -9,7 +9,6 @@ UIProgressBar._ZORDER_BG 	= -100
 UIProgressBar._ZORDER_FG 	= 0
 
 function UIProgressBar:ctor(__options)
-	--makeUIControl_(self)
 	makeUIControlWithoutEvent(self)
     self:setLayoutSizePolicy(display.FIXED_SIZE, display.FIXED_SIZE)
 

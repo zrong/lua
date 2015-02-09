@@ -29,6 +29,7 @@ function UILabelButton:ctor(__options)
     })
 
     makeEventDispatcher(self)
+    self:setNodeEventEnabled(true)
 
     __options = __options or {}
 
@@ -168,6 +169,8 @@ end
 
 function UILabelButton:_onTouch(evt)
 	local ename, ox, oy, px, py = evt.name, evt.x, evt.y, evt.prevX, evt.prevY
+    --d('UILabelButton:_onTouch')
+    --dump(evt)
     local __info = {
         name = ename,
         x = ox,
@@ -178,7 +181,7 @@ function UILabelButton:_onTouch(evt)
 
     if ename == "began" then
         UILabelButton._startPos = cc.p(ox, oy)
-        -- print('------------------- began 中调用 PRESSED_EVENT')
+        --d('------------------- began 中调用 PRESSED_EVENT')
         self._fsm:doEvent("press")
         self:dispatchEvent({name = UILabelButton.PRESSED_EVENT, x = ox, y = oy})
         return true
@@ -186,13 +189,13 @@ function UILabelButton:_onTouch(evt)
 
     if ename == "moved" then
         if self._fsm:canDoEvent("press") then
-            -- print('------------------- moved 中调用 PRESSED_EVENT')
+            --d('------------------- moved 中调用 PRESSED_EVENT')
             self._fsm:doEvent("press")
             self:dispatchEvent({name = UILabelButton.PRESSED_EVENT, x = ox, y = oy})
         end
     else
         if self._fsm:canDoEvent("release") then
-            -- print('------------------- ended 中调用 RELEASE_EVENT')
+            --d('------------------- ended 中调用 RELEASE_EVENT')
             self._fsm:doEvent("release")
             self:dispatchEvent({name = UILabelButton.RELEASE_EVENT, x = ox, y = oy})
         end
@@ -205,7 +208,7 @@ function UILabelButton:_onTouch(evt)
                     :addTo(self)
                     :align(display.CENTER, self.width / 2, self.height / 2)
             end
-            -- print('------------------- dispatchEvent CLICKED_EVENT 事件')
+            --d('------------------- dispatchEvent CLICKED_EVENT 事件')
             self:dispatchEvent({name = UILabelButton.CLICKED_EVENT, x = ox, y = oy})
 
             audio.playSFX(audio.BTN_CLICK)
@@ -214,32 +217,32 @@ function UILabelButton:_onTouch(evt)
 end
 
 function UILabelButton:addHandler(__event, __hanlder)
-    -- print('------------------- 添加了事件', vardump(__event))
+    -- d('------------------- 添加了事件', vardump(__event))
     self:addEventListener(__event, __hanlder)
 end
 
 function UILabelButton:onClick(__hanlder)
-    -- print('------------------------ 点击: onClick')
+    -- d('------------------------ 点击: onClick')
     self:setTouchEnabled(true)
     self:addHandler(UILabelButton.CLICKED_EVENT, __hanlder)
     return self
 end
 
 function UILabelButton:onPress(__hanlder)
-    -- print('------------------------ 点击按下: onPress')
+    -- d('------------------------ 点击按下: onPress')
     self:addHandler(UILabelButton.PRESSED_EVENT, __hanlder)
     return self
 end
 
 function UILabelButton:onRelease(__hanlder)
-    -- print('------------------------ 释放点击: onRelease')
+    -- d('------------------------ 释放点击: onRelease')
     self:addHandler(UILabelButton.RELEASE_EVENT, __hanlder)
     return self
 end
 
 function UILabelButton:_onStateChange(__event)
     if self:isRunning() then
-        -- print('------------ 状态转换', self._fsm:getState())
+        -- d('------------ 状态转换', self._fsm:getState())
     end
 end
 
