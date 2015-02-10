@@ -311,29 +311,32 @@ function RM._getDBFile(armName)
     return fullPath
 end
 
+-- 一个 DragonBones 的资源载入缓存
+-- 若提供 asyncHandler，则为异步载入。否则是同步载入。
 function RM.addDB(name, asyncHandler)
     local name, path = _splitname(name)
     local armFile = RM._getDBFile(path)
     local arm = _db[armFile]
     if arm then
         log:warning('ResourceManager.addDB %s(%s) 已经在缓存中了。', path, armFile)
-        asyncHandler(path, armFile, arm)
-        return true 
+    else
+        arm = {
+            -- 保存原始传递进来的 name 值，用于removeDBList
+            name=path,
+            path=armFile,
+            armatureName=name,
+            textureName=name,
+            skeletonName=name,
+        }
+        dragonbones.loadData(arm)
+        _db[armFile] = arm
     end
-    arm = {
-        -- 保存原始传递进来的 name 值，用于removeDBList
-        name=path,
-        path=armFile,
-        armatureName=name,
-        textureName=name,
-        skeletonName=name,
-    }
-    dragonbones.loadData(arm)
-    _db[armFile] = arm
-    dump(_db)
-    asyncHandler(path, armFile, arm)
-    -- 判断
-    return true
+    -- dump(_db)
+    if asyncHandler then
+        asyncHandler(path, armFile, arm)
+        return false
+    end
+    return arm
 end
 
 function RM.removeDB(name)
