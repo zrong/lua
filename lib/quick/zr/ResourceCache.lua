@@ -104,6 +104,16 @@ function RC.newSprite(sceneName, filename, x, y, params)
     return display.newSprite(fname, x, y, params)
 end
 
+-- 重新封装 display.newFilteredSprite ，提供将单张图片按场景缓存的功能。
+-- 这个封装不支持 SpriteFrameCache 中的碎图，其它参数完全相同。
+function RC.newFilteredSprite(sceneName, filters, params)
+    assert(string.byte(filename) ~= 35, 
+        'RC.newFilteredSprite, SpriteFrame is not supported!')
+    local fname = RM.normalizeFilePath(RM.T_TEX, filename)
+    RC.recordPdir(sceneName, fname)
+    return display.newFilteredSprite(fname, filters, params)
+end
+
 -- 重新封装 display.newScale9Sprite ，提供将 Scale9 单张图片按场景缓存的功能。
 -- 这个封装不支持 SpriteFrameCache 中的碎图，其它参数完全相同。
 function RC.newScale9Sprite(sceneName, filename, x, y, size, capInsets)

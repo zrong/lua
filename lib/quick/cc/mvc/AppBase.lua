@@ -10,8 +10,8 @@ function AppBase:ctor(appName, packageRoot)
     self.name = appName
     self.packageRoot = packageRoot or appName
 
-	--[[
-	-- remove to Main App
+    --[[
+    -- remove to Main App
     local eventDispatcher = cc.Director:getInstance():getEventDispatcher()
     local customListenerBg = cc.EventListenerCustom:create(AppBase.APP_ENTER_BACKGROUND_EVENT,
                                 handler(self, self.onEnterBackground))
@@ -19,7 +19,7 @@ function AppBase:ctor(appName, packageRoot)
     local customListenerFg = cc.EventListenerCustom:create(AppBase.APP_ENTER_FOREGROUND_EVENT,
                                 handler(self, self.onEnterForeground))
     eventDispatcher:addEventListenerWithFixedPriority(customListenerFg, 1)
-	]]
+    ]]
 
     self.snapshots_ = {}
 
@@ -44,15 +44,15 @@ end
 
 -- Import a class form this package
 function AppBase:import(className)
-	if not string.find(className, self.packageRoot .. '.') then
-		className = self.packageRoot .. '.' .. className
-	end
+    if not string.find(className, self.packageRoot .. '.') then
+        className = self.packageRoot .. '.' .. className
+    end
     return require(className)
 end
 
 --- Create Instance
 function AppBase:ci(className, ...)
-	return self:import(className).new(...)
+    return self:import(className).new(...)
 end
 
 function AppBase:makeLuaVMSnapshot()

@@ -15,7 +15,7 @@ function FU.isDir(filename)
 end
 
 function FU.isAbsolutePath(filename)
-	return fu:isAbsolutePath(filename)
+    return fu:isAbsolutePath(filename)
 end
 
 function FU.getWritablePath(filename)
@@ -40,7 +40,7 @@ end
 -- 读取文件内容
 function FU.readFile(filename)
     --fullpath = RM.getFullPath(filename)
-	local data = cc.HelperFunc:getFileData(filename)
+    local data = cc.HelperFunc:getFileData(filename)
     return data
 end
 
