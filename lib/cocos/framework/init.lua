@@ -23,8 +23,12 @@ THE SOFTWARE.
 ]]
 
 __G__TRACKBACK__ = function(msg)
+    print("****************************************")
+    print("------------ LUA ERROR -----------------")
     local msg = debug.traceback(msg, 3)
     print(msg)
+    print("------------ LUA ERROR END -------------")
+    print("****************************************")
     return msg
 end
 

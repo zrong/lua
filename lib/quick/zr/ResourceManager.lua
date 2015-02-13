@@ -151,7 +151,7 @@ end
 
 -- 将 ani 定义文件中的 plist 地址转换成绝对路径
 function RM._fillAniSFPath(defFile)
-    local def = dofile(defFile)
+    local def = assert(loadstring(cc.HelperFunc:getFileData(defFile)))()
     for key, path in pairs(def.spritesheets) do
         def.spritesheets[key] = RM.normalizeFilePath(RM.T_ANI_SF, path)
     end
