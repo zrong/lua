@@ -9,6 +9,7 @@ local CSU = {}
 local _cache = {}
 
 local FU = import('.FileUtil')
+local RC = import('.ResourceCache')
 
 function _retain(filename, filepath, scenename, sp)
 	log:info('CaptureScreenUtil._retain filename: %s, filepath: %s, scenename: %s, sp: %s', filename, filepath, scenename, sp)
@@ -47,15 +48,15 @@ end
 -- 	对此截屏用完后必须执行 clear 否则会引起内存泄露。
 function CSU.capture(asyncHandler, filename, scenename, filter)
     display.captureScreen(function(succ, filepath)
-		print('sp', succ, filepath)
+		-- log:info('CSU.captureScreen handler', succ, filepath)
 		if succ then
 			if scenename then
 				local sp = nil
 				if filter then
-					sp = lll.RC.newFilteredSprite(scenename, 
+					sp = RC.newFilteredSprite(scenename, 
 						filepath, filter.filters, filter.params)
 				else
-					sp = lll.RC.newSprite(scenename, filepath)
+					sp = RC.newSprite(scenename, filepath)
 				end
 				_retain(filename, filepath, scenename, sp)
 				asyncHandler(filepath, sp)
@@ -79,7 +80,7 @@ end
 
 function CSU.clear(filename)
 	local c = _release(filename)
-	lll.RC.removePdir(c.scenename, c.filepath)
+	RC.removePdir(c.scenename, c.filepath)
 	_cache[filename] = nil
 end
 

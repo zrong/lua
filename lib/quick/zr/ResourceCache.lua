@@ -106,7 +106,7 @@ end
 
 -- 重新封装 display.newFilteredSprite ，提供将单张图片按场景缓存的功能。
 -- 这个封装不支持 SpriteFrameCache 中的碎图，其它参数完全相同。
-function RC.newFilteredSprite(sceneName, filters, params)
+function RC.newFilteredSprite(sceneName, filename, filters, params)
     assert(string.byte(filename) ~= 35, 
         'RC.newFilteredSprite, SpriteFrame is not supported!')
     local fname = RM.normalizeFilePath(RM.T_TEX, filename)
@@ -129,7 +129,7 @@ function RC.newFilteredSprite(sceneName, filename, filters, params)
         'RC.newSprite, SpriteFrame is not supported!')
     local fname = RM.normalizeFilePath(RM.T_TEX, filename)
     RC.recordPdir(sceneName, fname)
-    return display.newFilteredSprite(fname, x, y, filters, params)
+    return display.newFilteredSprite(fname, filters, params)
 end
 
 -- 重新封装 display.newBatchNode ，提供将图片按场景缓存的功能。

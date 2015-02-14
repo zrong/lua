@@ -63,8 +63,8 @@ function filter.newFilter(filterName, param)
     end
 
     local paramCount = (param and #param) or 0
-    print("filter.newFilter:", paramCount, filterName, count)
-    print("filter.newFilter param:", param)
+    -- print("filter.newFilter:", paramCount, filterName, count)
+    -- print("filter.newFilter param:", param)
     -- If count is nil, it means the Filter does not need a parameter.
     if count == nil then
         if paramCount == 0 then
