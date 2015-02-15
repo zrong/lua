@@ -1294,7 +1294,9 @@ function display.newTTFLabel(params)
     local text       = tostring(params.text)
     local font       = params.font or display.DEFAULT_TTF_FONT
     local size       = params.size or display.DEFAULT_TTF_FONT_SIZE
-    local color      = params.color or display.COLOR_WHITE
+    -- 2015-02-15 zrong
+    -- 3.4 final 版中，setTextColor 的参数必须是 c4b
+    local color      = params.color or cc.c4b(255, 255, 255, 255)
     local textAlign  = params.align or cc.TEXT_ALIGNMENT_LEFT
     local textValign = params.valign or cc.VERTICAL_TEXT_ALIGNMENT_TOP
     local x, y       = params.x, params.y
@@ -1312,6 +1314,11 @@ function display.newTTFLabel(params)
     else
         label = cc.Label:createWithSystemFont(text, font, size, dimensions, textAlign, textValign)
         if label then
+            -- 2015-02-15 zrong
+            -- 3.4 final 版中，setTextColor 的参数必须是 c4b
+            if not color.a then
+                color.a = 255
+            end
             label:setTextColor(color)
         end
     end
