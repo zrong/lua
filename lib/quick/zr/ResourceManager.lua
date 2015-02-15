@@ -316,6 +316,7 @@ end
 function RM.addDB(name, asyncHandler)
     local name, path = _splitname(name)
     local armFile = RM._getDBFile(path)
+    d('RM.addDB name: %s armFile:%s', name, armFile)
     local arm = _db[armFile]
     if arm then
         log:warning('ResourceManager.addDB %s(%s) 已经在缓存中了。', path, armFile)
