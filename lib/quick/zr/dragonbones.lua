@@ -48,7 +48,11 @@ local dbManager = db.DBCCFactory:getInstance()
 --      skinName = ""
 --  }
 function dragonbones.new(params)
+    print('dragonbones.new params')
+    dump(params)
     args = dragonbones._initParam(params)
+    print('dragonbones.new args')
+    dump(args)
     dragonbones.loadData(args)
     local armature = dbManager:buildArmature(args.armatureName, args.skinName, 
         args.animationName, args.skeletonName, args.textureName)

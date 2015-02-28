@@ -301,6 +301,7 @@ function RM._getDBFile(armName)
         armFile = string.format('%s%s', RM.D_DB, armName)
     end
     local fullPath = FU.getFullPath(armFile)
+    d('RM._getDBFile armName:%s armFile:%s fullPath:%s', armName, armFile, fullPath)
     -- 在windows操作系统上，无法得到一个目录的路径
     if fullPath == '' then
         local xml = '/skeleton.xml'
