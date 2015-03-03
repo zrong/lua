@@ -34,7 +34,7 @@ function LogHandler:getString(level, fmt, args)
     if argsnum > 0 and _isfmt(fmt) then
         local fmtnum = select(2, string.gsub(fmt, '%%[%a%.]', ''))
         if fmtnum ~= argsnum then
-            strlist[#strlist+1] = 'LogHandler WARNING -- Cannot get a nil value between arguments OR you give a bad amout of arguments.'
+            strlist[#strlist+1] = string.format('LogHandler WARNING -- [%s] Cannot get a nil value between arguments OR you give a bad amout of arguments.', fmt)
         else
             strlist[#strlist+1] = string.format(fmt, unpack(args))
         end
