@@ -51,13 +51,6 @@ local function _getAniDefFile(name)
     return string.format('%s%s', RM.D_ANI, name)
 end
 
-local function _normalizeFilePath(dir, name)
-    if string.find(name, dir) == 1 then
-        return name
-    end
-    return string.format('%s%s', dir, name)
-end
-
 -- 判断 name 中是否有路径分隔符，将真正的 name 提取出来
 local function _splitname(name)
     local pathd = string.rfind(name, '/', 0, true)
