@@ -26,14 +26,21 @@ require "cocos.cocos2d.Cocos2d"
 require "cocos.cocos2d.Cocos2dConstants"
 require "cocos.cocos2d.functions"
 
-if CC_USE_FRAMEWORK then
+-- zrong 2015-03-06 vome Opengl and AudioEngine to global
+-- opengl
+require "cocos.cocos2d.Opengl"
+require "cocos.cocos2d.OpenglConstants"
+-- audio
+require "cocos.cocosdenshion.AudioEngine"
+
+
+if CC_USE_FRAMEWORK == nil then
+	-- zrong 2015-03-06
+	-- cocos.framewrok.init has been in the quick framework
+	-- and others libraries is unnecessary.
+elseif CC_USE_FRAMEWORK then
     require "cocos.framework.init"
 else
-    -- opengl
-    require "cocos.cocos2d.Opengl"
-    require "cocos.cocos2d.OpenglConstants"
-    -- audio
-    require "cocos.cocosdenshion.AudioEngine"
     -- cocosstudio
     if nil ~= ccs then
         require "cocos.cocostudio.CocoStudio"
