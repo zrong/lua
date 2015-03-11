@@ -32,6 +32,10 @@ require "cocos.cocos2d.Opengl"
 require "cocos.cocos2d.OpenglConstants"
 -- audio
 require "cocos.cocosdenshion.AudioEngine"
+-- extensions
+require "cocos.extension.ExtensionConstants"
+-- network
+require "cocos.network.NetworkConstants"
 
 
 if CC_USE_FRAMEWORK == nil then
@@ -51,10 +55,6 @@ else
         require "cocos.ui.experimentalUIConstants"
     end
 
-    -- extensions
-    require "cocos.extension.ExtensionConstants"
-    -- network
-    require "cocos.network.NetworkConstants"
     -- Spine
     if nil ~= sp then
         require "cocos.spine.SpineConstants"
