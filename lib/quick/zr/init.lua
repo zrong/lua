@@ -30,6 +30,7 @@ end
 local _zr = zr or {}
 
 _zr.FileUtil            = import('.FileUtil')
+_zr.SharedObject        = import('.SharedObject')
 _zr.ResourceManager     = import('.ResourceManager')
 _zr.ResourceCache       = import('.ResourceCache')
 _zr.CaptureScreenUtil  	= import('.CaptureScreenUtil')
