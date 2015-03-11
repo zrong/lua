@@ -13,8 +13,10 @@ function CtrlBase:ctor(view, name, parent)
     self._parent = parent
     self:_addParent()
     self:_registerEvents()
-    printInfo("CtrlBase ctor, classname:%s, instancename:%s", self.__cname, self._name)
-    printInfo("CtrlBase ctor, self._view:%s, self._parent:%s", self._view, self._parent)
+    printInfo("CtrlBase ctor, classname:%s, instancename:%s", 
+		tostring(self.__cname), tostring(self._name))
+    printInfo("CtrlBase ctor, self._view:%s, self._parent:%s", 
+		tostring(self._view), tostring(self._parent))
 end
 
 -- 所有注册的事件对象保存在 _eventProxy table 中。

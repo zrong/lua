@@ -36,7 +36,13 @@ function LogHandler:getString(level, fmt, args)
         if fmtnum ~= argsnum then
             strlist[#strlist+1] = string.format('LogHandler WARNING -- [%s] Cannot get a nil value between arguments OR you give a bad amout of arguments.', fmt)
         else
-            strlist[#strlist+1] = string.format(fmt, unpack(args))
+			-- Avoid error in lua 5.2
+			local succ, err = pcall(string.format, fmt, unpack(args))
+			if succ then
+				strlist[#strlist+1] = string.format(fmt, unpack(args))
+			else
+				strlist[#strlist+1] = string.format('LogHandler WARNING -- [%s] %s.', fmt, err)
+			end
         end
     elseif _isfmt(fmt) then
         fmt = string.gsub(fmt, '%%%a', 'nil')
