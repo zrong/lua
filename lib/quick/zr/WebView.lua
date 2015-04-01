@@ -6,15 +6,27 @@
 -- 创建日期：2015-04-01
 ----------------------------------------
 
-local isWebView = ccexp.WebView and true or false
+local isWebView = nil
+if device.platform == 'android' or device.platform == 'ios' then
+	if ccexp.WebView then
+		isWebView = true
+	end
+else
+	isWebView = false
+end
+
+local loadURL, loadFile, loadHTMLString, reload
+if isWebView then
+	loadURL = ccexp.WebView.loadURL
+	loadFile = ccexp.WebView.loadFile
+	loadHTMLString = ccexp.WebView.loadHTMLString
+	reload = ccexp.WebView.reload
+end
 
 local WebView = class('WebView', function()
-	if device.platform == 'android' or device.platform == 'ios' then
-		if isWebView then
-			return ccexp.WebView:create()
-		end
+	if isWebView then
+		return ccexp.WebView:create()
 	end
-	isWebView = false
 	return display.newNode()
 end)
 
@@ -30,14 +42,32 @@ function WebView:isWebView()
 	return isWebView
 end
 
-local loadURL = nil
-if isWebView then
-	loadURL = ccexp.WebView.loadURL
-end
 function WebView:loadURL(url)
 	if loadURL then
 		loadURL(self, url)
 	end
+	return self
+end
+
+function WebView:loadFile(file)
+	if loadFile then
+		loadFile(self, file)
+	end
+	return self
+end
+
+function WebView:loadHTMLString(str)
+	if loadHTMLString then
+		loadHTMLString(self, str)
+	end
+	return self
+end
+
+function WebView:reload()
+	if reload then
+		reload(self)
+	end
+	return self
 end
 
 return WebView
