@@ -53,10 +53,14 @@ function DBCCArmatureNode:stop()
     return self
 end
 
--- 获取包围盒，返回一个 Rect 对象。
+-- 2015-05-08 zrong
+-- getBoundingBox 已经导出，不必再处理
+-- 为了计算相对位置，应该使用 getInnerBoundingBox
+--[[ 获取包围盒，返回一个 Rect 对象。
 function DBCCArmatureNode:getBoundingBox()
     return tolua.getcfunction(self, 'getBoundingBox')(self)
 end
+]]
 
 -- 获取一个动画的 scale 值，单位秒。
 function DBCCArmatureNode:getAnimationScale(name)

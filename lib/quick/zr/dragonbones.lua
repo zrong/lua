@@ -1,6 +1,8 @@
 --- DragonBones
 -- @author zrong(zengrong.net)
 -- Creation 2014-07-24
+-- Modification 2015-05-08
+
 local dragonbones = {}
 
 dragonbones.EventType = 
@@ -19,7 +21,7 @@ dragonbones.EventType =
     _ERROR = 11,
 }
 
-local dbManager = db.DBCCFactory:getInstance()
+local dbFactory = db.DBCCFactory:getInstance()
 
 --- 创建一个 DBCCArmatureNode 对象
 -- @author zrong(zengrong.net)
@@ -54,9 +56,12 @@ function dragonbones.new(params)
     print('dragonbones.new args')
     dump(args)
     dragonbones.loadData(args)
-    local armature = dbManager:buildArmature(args.armatureName, args.skinName, 
+    return dbFactory:buildArmatureNode(args.armatureName, args.skinName, 
         args.animationName, args.skeletonName, args.textureName)
-    return db.DBCCArmatureNode:create(armature)
+end
+
+function dragonbones.setFactory(factory)
+	dbFactory = factory
 end
 
 function dragonbones._initParam(params)
@@ -83,9 +88,9 @@ function dragonbones.loadData(params, initParam)
         args = dragonbones._initParam(params)
     end
     if args.path then
-        dbManager:loadDataByDir(args.path, args.skeletonName, args.textureName)
+        dbFactory:loadDataByDir(args.path, args.skeletonName, args.textureName)
     elseif args.skeleton and args.texture then
-        dbManager:loadData(args.skeleton, args.texture, 
+        dbFactory:loadData(args.skeleton, args.texture, 
             args.skeletonName, args.textureName)
     end
 end
@@ -95,7 +100,7 @@ function dragonbones.unloadData(params, initParam)
     if initParam then
         args = dragonbones._initParam(params)
     end
-    dbManager:unloadData(args.skeletonName, args.textureName)
+    dbFactory:unloadData(args.skeletonName, args.textureName)
 end
 
 return dragonbones
