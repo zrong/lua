@@ -56,7 +56,7 @@ The necessary global functions are:
 
 ## zr.utils.Gettext
 
-A detailed example about [GNU gettext][9] and [Poedit][8] (in chinese): <http://zengrong.net/post/1986.htm>
+A detailed example about [GNU gettext][9] and [Poedit][8] (in chinese): <https://blog.zengrong.net/post/using_gettext_in_lua/>
 
 Usage:
 
