@@ -10,7 +10,7 @@ Following libraries are dependented:
 
 # 1. For pure lua
 
-For some reason in my server development, I moved some packages that my wrote in to **zr** package (They were in **cc** package ago).
+For some reason in my server development, I moved some packages that my wrote in to **zr** package (They were in **cc** package before).
 
 # 2. For [quick-cocos2d-x][10]
 
@@ -228,8 +228,41 @@ log:debug('My name is %s.', 'zrong')
 -- [5.3279] My name is zrong.
 ```
 
+# 5. LICENSE
+
+BSD 3-Clause License
+
+Copyright (c) 2018, Jacky Tsang
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 [1]: https://github.com/chukong/quick-cocos2d-x/tree/develop/framework
-[2]: http://zengrong.net
+[2]: https://zengrong.net
 [3]: http://underpop.free.fr/l/lua/lpack/
 [4]: http://bitop.luajit.org/index.html
 [5]: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html
@@ -238,4 +271,4 @@ log:debug('My name is %s.', 'zrong')
 [8]: http://www.poedit.net/
 [9]: http://www.gnu.org/software/gettext/
 [10]: https://github.com/chukong/quick-cocos2d-x
-[51]: http://zengrong.net/wp-content/uploads/2013/11/luabytearray.png
+[51]: https://blog.zengrong.net/uploads/2013/11/luabytearray.png
