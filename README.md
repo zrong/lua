@@ -53,6 +53,7 @@ The necessary global functions are:
 - [zr.log](#log)
 	
 <a name="Gettext">
+
 ## zr.utils.Gettext
 
 A detailed example about [GNU gettext][9] and [Poedit][8] (in chinese): <http://zengrong.net/post/1986.htm>
@@ -89,6 +90,7 @@ print(_("world"))
 ```
 
 <a name="ByteArray">
+
 ## zr.utils.ByteArray
 
 It can serialize bytes stream like ActionScript [flash.utils.ByteArray][5]
@@ -143,6 +145,7 @@ Above codes will print like these:
 ![print result][51]
 
 <a name="ByteArrayVarint">
+
 ## zr.utils.ByteArrayVarint
 
 ByteArrayVarint depends on [BitOP][4].
@@ -169,6 +172,7 @@ Your can use these methods(and all ByteArray methods) in ByteArrayVarint:
 On account of a [BitOP][4] limitation, ByteArrayVarint will read a unsigned int as a **minus**.
 
 <a name="SocketTCP">
+
 ## zr.net.SocketTCP
 
 The SocketTCP depends on [LuaSocket][6]
@@ -198,6 +202,7 @@ end
 ```
 
 <a name="log">
+
 ## zr.log
 
 `zr.log` package is very similar to python logging package.
@@ -271,4 +276,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 [8]: http://www.poedit.net/
 [9]: http://www.gnu.org/software/gettext/
 [10]: https://github.com/chukong/quick-cocos2d-x
-[51]: https://blog.zengrong.net/uploads/2013/11/luabytearray.png
+[51]: ./luabytearray.png
